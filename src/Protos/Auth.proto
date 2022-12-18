@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "cst_back";
+
+package auth;
+
+// The greeting service definition.
+service Auth {
+  // Sends a greeting
+  rpc CreateAccount (CreateRequest) returns (CreateResponse);
+}
+
+// The request message containing the user's name.
+message CreateRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string confPassword = 4;
+}
+
+// The response message containing the greetings.
+message CreateResponse {
+  string id = 1;
+}
