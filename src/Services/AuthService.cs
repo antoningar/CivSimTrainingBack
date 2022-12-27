@@ -1,9 +1,8 @@
-﻿using cst_back;
-using Grpc.Core;
+﻿using Grpc.Core;
 
 namespace cst_back.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService : Auth.AuthBase, IAuthService
     {
         private readonly ILogger<AuthService> _logger;
 
@@ -12,15 +11,13 @@ namespace cst_back.Services
             _logger = logger;
         }
 
-        public Task<CreateResponse> CreateAccount(CreateRequest request)
+        public override Task<CreateResponse> CreateAccount(CreateRequest request, ServerCallContext context)
         {
-            throw new RpcException(new Status(StatusCode.Unimplemented, ""));
-            /*
-            return Task.FromResult(new HelloReply
+            _logger.LogInformation("Auth/CreateAccount request");
+            return Task.FromResult(new CreateResponse()
             {
-                Message = "Hello " + request
+                Id = "5"
             });
-            */
         }
     }
 }
