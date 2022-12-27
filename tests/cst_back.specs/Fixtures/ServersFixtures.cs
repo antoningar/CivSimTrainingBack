@@ -1,4 +1,7 @@
-﻿using cst_back.Services;
+﻿using cst_back.Interceptors;
+using cst_back.Services;
+using cst_back.Validators;
+using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -14,7 +17,11 @@ namespace cst_back.specs.Fixtures
             return new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddGrpc();
+                    services.AddGrpc(options =>
+                    {
+                        options.Interceptors.Add<ServerInterceptor>();
+                    });
+                    services.AddScoped<IValidator<CreateAccountRequest>, CreateAccountValidator>();
                     services.AddSingleton(serviceDefinition);
                 })
                 .Configure(app =>
@@ -25,6 +32,6 @@ namespace cst_back.specs.Fixtures
                         endpoints.MapGrpcService<AuthService>();
                     });
                 }));
-        
+        }
     }
 }

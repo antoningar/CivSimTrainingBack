@@ -1,5 +1,8 @@
 using cst_back.Services;
 using cst_back.specs.Fixtures;
+using cst_back.Validators;
+using FluentValidation;
+using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
@@ -11,8 +14,8 @@ namespace cst_back.specs.StepDefinitions
     [Binding]
     public class CreateAccountStepDefinitions
     {
-        private readonly CreateRequest _createRequest = new();
-        private CreateResponse? _createResponse;
+        private readonly CreateAccountRequest _createRequest = new();
+        private CreateAccountResponse? _createResponse;
         private TestServer? _authServer;
         private Auth.AuthClient? _authClient;
 
@@ -20,7 +23,8 @@ namespace cst_back.specs.StepDefinitions
         public void GivenAsAUser()
         {
             Mock<ILogger<AuthService>> mockLogger = new();
-            Auth.AuthBase authService = new AuthService(mockLogger.Object);
+            CreateAccountValidator validator = new();
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, validator);
             _authServer = ServersFixtures.GetAuthServer(authService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
@@ -59,11 +63,17 @@ namespace cst_back.specs.StepDefinitions
             _createResponse = _authClient!.CreateAccount(_createRequest);
         }
 
-        [Then(@"I should receive a response  (.*)")]
-        public void ThenIShouldReceiveAResponse(int p0)
+        [Then(@"I should receive a response my id")]
+        public void ThenIShouldReceiveAResponseMyId()
         {
             _authServer!.Dispose();
             Assert.True(Convert.ToInt64(_createResponse!.Id) > 0);
+        }
+
+        [When(@"I want to create my  account, I shouldn't received my id")]
+        public void WhenIWantToCreateMyAccountIShouldntReceivedMyId()
+        {
+            Assert.ThrowsAny<RpcException>(() => _authClient!.CreateAccount(_createRequest));
         }
     }
 }
