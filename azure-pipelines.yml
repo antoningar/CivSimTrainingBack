@@ -1,0 +1,39 @@
+# Start with a clean environment
+pool:
+  vmImage: 'windows-latest'
+
+# Build and test the solution
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '**/*.sln'
+    dependsOn: NuGetToolInstaller@1
+
+- task: VSBuild@1
+  inputs:
+    solution: '**/*.sln'
+    msbuildArgs: '/p:Configuration=Release /p:Platform="Any CPU"'
+    platform: 'Any CPU'
+    configuration: 'Release'
+    dependsOn: NuGetCommand@2
+
+- task: VSTest@2
+  inputs:
+    platform: 'x64'
+    configuration: 'Release'
+    dependsOn: VSBuild@1
+
+- task: SpecFlowPlus@0
+  inputs:
+    generatorSource: 'TestAssembly'
+    testAssemblyFilePath: '**/*.feature.dll'
+    dependsOn: VSTest@2
+
+# Publish the build artifacts
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(build.artifactstagingdirectory)'
+    artifactName: 'drop'
+    dependsOn: SpecFlowPlus@0
