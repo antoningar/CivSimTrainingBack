@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cst_back.specs", "tests\cst
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cst_back", "src\cst_back.csproj", "{1B503B9F-517A-4A45-AD37-0E13499D838F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cst_back.tests", "cst_back.tests\cst_back.tests.csproj", "{83F325A3-D28B-48CB-8DDC-A48567877A88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{1B503B9F-517A-4A45-AD37-0E13499D838F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B503B9F-517A-4A45-AD37-0E13499D838F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B503B9F-517A-4A45-AD37-0E13499D838F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83F325A3-D28B-48CB-8DDC-A48567877A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83F325A3-D28B-48CB-8DDC-A48567877A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83F325A3-D28B-48CB-8DDC-A48567877A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83F325A3-D28B-48CB-8DDC-A48567877A88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

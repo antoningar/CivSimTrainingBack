@@ -12,7 +12,7 @@ Scenario: Create Account
 
 	Examples: 
 	| username | email   | password | confPassword |
-	| aa      | a@a.com | aaaaaaaa | aaaaaaaa     |
+	| aa       | a@a.com | aaaaaaaa | aaaaaaaa     |
 	| aaaa     | a.a.com | aaaaaaaa | aaaaaaaa     |
 	| aaaa     | a@a.com | aaaa     | aaaa         |
 	| aaaa     | a@a.com | aaaaaaaa | aaaa         |
