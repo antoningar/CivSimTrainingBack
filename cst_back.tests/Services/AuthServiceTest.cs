@@ -1,4 +1,5 @@
 ﻿using Castle.Core.Logging;
+using cst_back.DBServices;
 using cst_back.Models;
 using cst_back.Services;
 using cst_back.Validators;
@@ -21,8 +22,10 @@ namespace cst_back.tests.Services
         {
             var context = Helper.GetServerCallContext(nameof(IAuthService.CreateAccount));
             Mock<ILogger<AuthService>> mockLogger = new();
-            Mock<IAccountDBService> dbServiceMock = new();
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), dbServiceMock.Object);
+            Mock<IAccountDBService> dbAccountServiceMock = new();
+            Mock<ICounterDBService> dbCounterServices = new();
+
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), dbAccountServiceMock.Object);
 
             CreateAccountRequest createRequest = new()
             {
@@ -40,7 +43,7 @@ namespace cst_back.tests.Services
         [InlineData("aaaa", "sil2ob@a.com", "aaaaaaaa", "aaaaaaaa")]
         public async Task CreateAccount_ShouldCheckIfAnAccountAlreadytExist(string username, string email, string password, string confPassword)
         {
-            Account account = new Account()
+            Account account = new()
             {
                 Email= email,
                 Username=username
@@ -67,6 +70,35 @@ namespace cst_back.tests.Services
             };
 
             await Assert.ThrowsAsync<RpcException>(() => authService.CreateAccount(createRequest, context));
+        }
+
+        [Theory]
+        [InlineData("sil2ob", "a@a.com", "aaaaaaaa", "aaaaaaaa")]
+        public async Task CreateAccount_ShouldCreateAccount(string username, string email, string password, string confPassword)
+        {
+            int counter = 5;
+
+            var context = Helper.GetServerCallContext(nameof(IAuthService.CreateAccount));
+            Mock<ILogger<AuthService>> mockLogger = new();
+
+
+            Mock<IAccountDBService> dbAccountServiceMock = new();
+            dbAccountServiceMock
+                .Setup(x => x.InsertAccountAsync(It.IsAny<Account>()))
+                .ReturnsAsync(counter+1);
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), dbAccountServiceMock.Object);
+
+            CreateAccountRequest createRequest = new()
+            {
+                Username = username,
+                Email = email,
+                Password = password,
+                ConfPassword = confPassword
+            };
+
+            CreateAccountResponse response = await authService.CreateAccount(createRequest, context);
+            Assert.Equal(counter + 1, response.Id);
+            dbAccountServiceMock.Verify(s => s.InsertAccountAsync(It.IsAny<Account>()), Times.Once());
         }
     }
 }

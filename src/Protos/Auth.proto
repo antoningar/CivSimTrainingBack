@@ -16,5 +16,5 @@ message CreateAccountRequest {
 }
 
 message CreateAccountResponse {
-  string id = 1;
+  int32 id = 1;
 }

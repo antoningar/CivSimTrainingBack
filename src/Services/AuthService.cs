@@ -1,6 +1,9 @@
-﻿using FluentValidation;
+﻿using cst_back.Models;
+using FluentValidation;
 using FluentValidation.Results;
 using Grpc.Core;
+using BCrypt.Net;
+using cst_back.DBServices;
 
 namespace cst_back.Services
 {
@@ -41,10 +44,18 @@ namespace cst_back.Services
         {
             await CheckCreateConditions(request);
 
-            return await Task.FromResult(new CreateAccountResponse()
+            Account account = new()
             {
-                Id = "5"
-            });
+                Username = request.Username,
+                Email = request.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            };
+
+            int? userid = await _accountDBService.InsertAccountAsync(account);
+            return new CreateAccountResponse()
+            {
+                Id = (int)userid,
+            };
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using cst_back.Models;
 
-namespace cst_back.Services
+namespace cst_back.DBServices
 {
     public interface IAccountDBService
     {
         public Task<Account?> GetAccountByUsernameAsync(string username);
         public Task<Account?> GetAccountByEmailAsync(string email);
-        public Task<List<Account>> InsertAccountAsync(Account account);
+        public Task<int?> InsertAccountAsync(Account account);
     }
 }

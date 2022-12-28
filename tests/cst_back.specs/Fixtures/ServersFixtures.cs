@@ -1,4 +1,5 @@
-﻿using cst_back.Interceptors;
+﻿using cst_back.DBServices;
+using cst_back.Interceptors;
 using cst_back.Models;
 using cst_back.Services;
 using cst_back.Validators;
@@ -7,8 +8,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using Moq;
+using System.Diagnostics.Metrics;
 
 namespace cst_back.specs.Fixtures
 {
@@ -18,6 +19,7 @@ namespace cst_back.specs.Fixtures
         {
             var serviceDefinition = Auth.BindService(authService);
 
+            Mock<ICounterDBService> mockCounterDBService = new();
             Mock<IAccountDBService> mockAccountDBService = new();
             mockAccountDBService
                 .Setup(x => x.GetAccountByEmailAsync(It.IsAny<string>()))
@@ -25,6 +27,9 @@ namespace cst_back.specs.Fixtures
             mockAccountDBService
                 .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
                 .ReturnsAsync(It.IsAny<Account>());
+            mockAccountDBService
+                .Setup(x => x.InsertAccountAsync(It.IsAny<Account>()))
+                .ReturnsAsync(1);
 
             return new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
@@ -34,6 +39,7 @@ namespace cst_back.specs.Fixtures
                         options.Interceptors.Add<ServerInterceptor>();
                     });
 
+                    services.AddSingleton(mockCounterDBService.Object);
                     services.AddSingleton(mockAccountDBService.Object);
                     services.AddScoped<IValidator<CreateAccountRequest>, CreateAccountValidator>();
                     services.AddSingleton(serviceDefinition);

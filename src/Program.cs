@@ -1,3 +1,4 @@
+using cst_back.DBServices;
 using cst_back.Interceptors;
 using cst_back.Services;
 using cst_back.Settings;
@@ -24,6 +25,7 @@ builder.Services.Configure<AccountDatabaseSettings>(
     builder.Configuration.GetSection("AccountStoreDatabase"));
 
 builder.Services.AddSingleton<IAccountDBService, AccountDBService>();
+builder.Services.AddSingleton<ICounterDBService, CounterDBService>();
 
 builder.Services.AddGrpc(options =>
 {
