@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "cst_back.Services";
+
+package auth;
+
+service Auth {
+  rpc CreateAccount (CreateAccountRequest) returns (CreateAccountResponse);
+}
+
+message CreateAccountRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string confPassword = 4;
+}
+
+message CreateAccountResponse {
+  int32 id = 1;
+}
