@@ -1,3 +1,4 @@
+using cst_back.Models;
 using cst_back.Services;
 using cst_back.specs.Fixtures;
 using cst_back.Validators;
@@ -6,6 +7,8 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using Moq;
 using Newtonsoft.Json;
 
@@ -24,7 +27,23 @@ namespace cst_back.specs.StepDefinitions
         {
             Mock<ILogger<AuthService>> mockLogger = new();
             CreateAccountValidator validator = new();
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, validator);
+
+
+            var collectionMock = Mock.Of<IMongoCollection<Account>>();
+            Mock<IMongoDatabase> dbMock = new();
+            dbMock
+                .Setup(x => x.GetCollection<Account>(It.IsAny<string>(), It.IsAny<MongoCollectionSettings>()))
+                .Returns(collectionMock);
+
+            Mock<IAccountDBService> dbServiceMock = new();
+            dbServiceMock
+                .Setup(x => x.GetAccountByEmailAsync(It.IsAny<string>()))
+                .ReturnsAsync(It.IsAny<Account>());
+            dbServiceMock
+                .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
+                .ReturnsAsync(It.IsAny<Account>());
+
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, validator, dbServiceMock.Object);
             _authServer = ServersFixtures.GetAuthServer(authService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {

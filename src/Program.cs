@@ -1,8 +1,11 @@
+using cst_back;
 using cst_back.Interceptors;
 using cst_back.Services;
+using cst_back.Settings;
 using cst_back.Validators;
 using FluentValidation;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using MongoDB.Driver;
 using Serilog;
 using System.Net;
 
@@ -16,7 +19,12 @@ var configuration = new ConfigurationBuilder()
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(configuration)
     .CreateLogger();
-    
+
+builder.Services.Configure<AccountDatabaseSettings>(
+    builder.Configuration.GetSection("AccountStoreDatabase"));
+
+builder.Services.AddSingleton<IAccountDBService, AccountDBService>();
+
 builder.Services.AddGrpc(options =>
 {
     options.Interceptors.Add<ServerInterceptor>();
@@ -33,7 +41,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
-var app = builder.Build();
+ var app = builder.Build();
 
 app.MapGrpcService<AuthService>();
 
