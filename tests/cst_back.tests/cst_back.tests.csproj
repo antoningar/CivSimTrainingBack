@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\cst_back.csproj" />
+    <ProjectReference Include="..\..\src\cst_back.csproj" />
   </ItemGroup>
 
 </Project>
