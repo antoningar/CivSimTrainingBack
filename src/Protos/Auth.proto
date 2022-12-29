@@ -6,6 +6,7 @@ package auth;
 
 service Auth {
   rpc CreateAccount (CreateAccountRequest) returns (CreateAccountResponse);
+  rpc Connect (ConnectRequest) returns (ConnectResponse);
 }
 
 message CreateAccountRequest {
@@ -17,4 +18,13 @@ message CreateAccountRequest {
 
 message CreateAccountResponse {
   int32 id = 1;
+}
+
+message ConnectRequest {
+	string username = 1;
+	string password = 2;
+}
+
+message ConnectResponse {
+	int32 id = 1;
 }

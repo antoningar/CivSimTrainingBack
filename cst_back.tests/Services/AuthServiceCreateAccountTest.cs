@@ -1,17 +1,15 @@
-﻿using Castle.Core.Logging;
-using cst_back.DBServices;
+﻿using cst_back.DBServices;
+using cst_back.Helpers;
 using cst_back.Models;
 using cst_back.Services;
 using cst_back.Validators;
 using Grpc.Core;
-using Grpc.Core.Testing;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System.ComponentModel.DataAnnotations;
 
 namespace cst_back.tests.Services
 {
-    public class AuthServiceTest
+    public class AuthServiceCreateAccountTest
     {
         [Theory]
         [InlineData("aa","a@a.com","aaaaaaaa","aaaaaaaa")]
@@ -24,8 +22,9 @@ namespace cst_back.tests.Services
             Mock<ILogger<AuthService>> mockLogger = new();
             Mock<IAccountDBService> dbAccountServiceMock = new();
             Mock<ICounterDBService> dbCounterServices = new();
+            Mock<ICryptoHelper> cryptoHelper = new();
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), dbAccountServiceMock.Object);
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
 
             CreateAccountRequest createRequest = new()
             {
@@ -59,7 +58,9 @@ namespace cst_back.tests.Services
             dbServiceMock
                 .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
                 .ReturnsAsync(account);
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), dbServiceMock.Object);
+            Mock<ICryptoHelper> cryptoHelper = new();
+
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), new ConnectValidator(), dbServiceMock.Object, cryptoHelper.Object);
 
             CreateAccountRequest createRequest = new()
             {
@@ -86,7 +87,9 @@ namespace cst_back.tests.Services
             dbAccountServiceMock
                 .Setup(x => x.InsertAccountAsync(It.IsAny<Account>()))
                 .ReturnsAsync(counter+1);
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), dbAccountServiceMock.Object);
+            Mock<ICryptoHelper> cryptoHelper = new();
+
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
 
             CreateAccountRequest createRequest = new()
             {

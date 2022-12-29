@@ -1,4 +1,5 @@
 using cst_back.DBServices;
+using cst_back.Helpers;
 using cst_back.Models;
 using cst_back.Services;
 using cst_back.specs.Fixtures;
@@ -7,7 +8,6 @@ using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using Moq;
 
 namespace cst_back.specs.StepDefinitions
@@ -24,25 +24,17 @@ namespace cst_back.specs.StepDefinitions
         public void GivenAsAUser()
         {
             Mock<ILogger<AuthService>> mockLogger = new();
-            CreateAccountValidator validator = new();
-
-
-            var collectionMock = Mock.Of<IMongoCollection<Account>>();
-            Mock<IMongoDatabase> dbMock = new();
-            dbMock
-                .Setup(x => x.GetCollection<Account>(It.IsAny<string>(), It.IsAny<MongoCollectionSettings>()))
-                .Returns(collectionMock);
+            CreateAccountValidator createValidator = new();
+            ConnectValidator connectValidator = new();
 
             Mock<IAccountDBService> dbServiceMock = new();
             dbServiceMock
-                .Setup(x => x.GetAccountByEmailAsync(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<Account>());
-            dbServiceMock
-                .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
-                .ReturnsAsync(It.IsAny<Account>());
+                .Setup(x => x.InsertAccountAsync(It.IsAny<Account>()))
+                .ReturnsAsync(1);
+            Mock<ICryptoHelper> cryptoHelper = new();
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, validator, dbServiceMock.Object);
-            _authServer = ServersFixtures.GetAuthServer(authService);
+            Auth.AuthBase authService = new AuthService(mockLogger.Object, createValidator, connectValidator, dbServiceMock.Object, cryptoHelper.Object);
+            _authServer = ServersFixtures.GetAuthServer(authService, dbServiceMock);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
                 HttpClient = _authServer.CreateClient()
