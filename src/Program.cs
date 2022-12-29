@@ -1,4 +1,5 @@
 using cst_back.DBServices;
+using cst_back.Helpers;
 using cst_back.Interceptors;
 using cst_back.Services;
 using cst_back.Settings;
@@ -26,6 +27,7 @@ builder.Services.Configure<AccountDatabaseSettings>(
 
 builder.Services.AddSingleton<IAccountDBService, AccountDBService>();
 builder.Services.AddSingleton<ICounterDBService, CounterDBService>();
+builder.Services.AddSingleton<ICryptoHelper, CryptoHelper>();
 
 builder.Services.AddGrpc(options =>
 {
@@ -34,6 +36,7 @@ builder.Services.AddGrpc(options =>
 builder.Services.AddGrpcReflection();
 
 builder.Services.AddScoped<IValidator<CreateAccountRequest>, CreateAccountValidator>();
+builder.Services.AddScoped<IValidator<ConnectRequest>, ConnectValidator>();
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {

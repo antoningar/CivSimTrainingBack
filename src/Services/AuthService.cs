@@ -1,9 +1,9 @@
-﻿using cst_back.Models;
+﻿using cst_back.DBServices;
+using cst_back.Helpers;
+using cst_back.Models;
 using FluentValidation;
 using FluentValidation.Results;
 using Grpc.Core;
-using BCrypt.Net;
-using cst_back.DBServices;
 
 namespace cst_back.Services
 {
@@ -11,13 +11,22 @@ namespace cst_back.Services
     {
         private readonly ILogger<AuthService> _logger;
         private readonly IValidator<CreateAccountRequest> _createAccountValidator;
+        private readonly IValidator<ConnectRequest> _connectAccountValidator;
         private readonly IAccountDBService _accountDBService;
+        private readonly ICryptoHelper _cryptoHelper;
 
-        public AuthService(ILogger<AuthService> logger, IValidator<CreateAccountRequest> createAccountValidator, IAccountDBService accountDBService)
+        public AuthService(
+            ILogger<AuthService> logger,
+            IValidator<CreateAccountRequest> createAccountValidator,
+            IValidator<ConnectRequest> connectValidator,
+            IAccountDBService accountDBService,
+            ICryptoHelper cryptoHelper)
         {
             _logger = logger;
             _createAccountValidator = createAccountValidator;
+            _connectAccountValidator = connectValidator;
             _accountDBService = accountDBService;
+            _cryptoHelper = cryptoHelper;
         }
 
         private async Task CheckCreateConditions(CreateAccountRequest request)
@@ -28,8 +37,6 @@ namespace cst_back.Services
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, isValid.Errors[0].ErrorMessage));
             }
 
-            var byEmail = await _accountDBService.GetAccountByEmailAsync(request.Email);
-            var byUsername = await _accountDBService.GetAccountByUsernameAsync(request.Username);
             if (await _accountDBService.GetAccountByEmailAsync(request.Email) != null)
             {
                 throw new RpcException(new Status(StatusCode.AlreadyExists, "email still in base"));
@@ -48,14 +55,44 @@ namespace cst_back.Services
             {
                 Username = request.Username,
                 Email = request.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                Password = _cryptoHelper.Hash(request.Password),
             };
 
-            int? userid = await _accountDBService.InsertAccountAsync(account);
+            int? accountId = await _accountDBService.InsertAccountAsync(account);
             return new CreateAccountResponse()
             {
-                Id = (int)userid,
+                Id = (int)accountId,
             };
+        }
+
+        public override async Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
+        {
+            checkConnectConditions(request);
+
+            Account? account = await _accountDBService.GetAccountByUsernameAsync(request.Username);
+            if (account == null || account!.AccountId == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Account not found"));
+            }
+
+            if (!_cryptoHelper.Verify(request.Password, account!.Password!))
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Account not found"));
+            }
+
+            return new ConnectResponse()
+            {
+                Id = (int)account!.AccountId!
+            };
+        }
+
+        private void checkConnectConditions(ConnectRequest request)
+        {
+            ValidationResult isValid = _connectAccountValidator.Validate(request);
+            if (!isValid.IsValid)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, isValid.Errors[0].ErrorMessage));
+            }
         }
     }
 }

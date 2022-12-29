@@ -34,11 +34,16 @@ namespace cst_back.DBServices
         public async Task<int?> InsertAccountAsync(Account account)
         {
             int? counter = await _counterDBService.GetUserIdCounterAsync();
-            account.UserId = ++counter;
+            account.AccountId = ++counter;
             await _accountCollection.InsertOneAsync(account);
             await _counterDBService.IncrementUserIdCounterAsync();
 
-            return account.UserId;
+            return account.AccountId;
+        }
+
+        public async Task<Account?> GetAccountByUsernameAndHashedPassword(string username, string password)
+        {
+            return await _accountCollection.Find(x => x.Username == username && BCrypt.Net.BCrypt.Verify(x.Password, password, false, BCrypt.Net.HashType.SHA384) == true).FirstOrDefaultAsync();
         }
     }
 }

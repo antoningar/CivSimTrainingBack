@@ -38,4 +38,15 @@ namespace cst_back.Validators
                 .WithMessage("Passwords doesn't match");
         }
     }
+
+    public class ConnectValidator : AbstractValidator<ConnectRequest>
+    {
+        public ConnectValidator()
+        {
+            RuleFor(x => x.Username)
+                .SetValidator(new UsernameValidator());
+            RuleFor(x => x.Password)
+                .SetValidator(new PasswordValidator());
+        }
+    }
 }

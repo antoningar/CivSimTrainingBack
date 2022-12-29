@@ -7,6 +7,7 @@ namespace cst_back.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
         public int? userid_counter{ get; set; }
     }
 }
