@@ -1,0 +1,45 @@
+parameters:
+  configuration: ''
+  project: ''
+  testProject: ''
+
+jobs:
+  - job: 'CST_BACK_CI'
+
+    steps:
+      - task: UseDotNet@2
+        displayName: 'Use .Net 6.x'
+        inputs:
+          packageType: 'sdk'
+          version: '6.x'
+
+      - task: NuGetToolInstaller@1
+        displayName: 'Use NuGet 6.x'
+        inputs:
+          versionSpec: 6.x
+          checkLatest: true
+
+      - task: NuGetCommand@2
+        displayName: 'NuGet restore'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Dotnet build'
+        name: Build
+        inputs:
+          command: 'build'
+          projects: ${{ parameters.project }}
+          arguments: '-c ${{ parameters.configuration }} --no-restore'
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Dotnet Test'
+        name: Test
+        inputs:
+          command: 'test'
+          project: ${{ parameters.testProject }}
+
+      # Publish the build artifacts
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(build.artifactstagingdirectory)'
+          artifactName: 'drop'
+          dependsOn: SpecFlowPlus@0
