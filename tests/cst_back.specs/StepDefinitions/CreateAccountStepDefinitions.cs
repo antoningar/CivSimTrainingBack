@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace cst_back.specs.StepDefinitions
+namespace cst_back.specs.StepDefinitions.Create
 {
     [Binding]
     public class CreateAccountStepDefinitions
@@ -20,10 +20,11 @@ namespace cst_back.specs.StepDefinitions
         private TestServer? _authServer;
         private Auth.AuthClient? _authClient;
 
-        [Given(@"As a user")]
-        public void GivenAsAUser()
+        [Scope(Feature = "CreateAccountError")]
+        [Scope(Feature = "CreateAccount")]
+        [Given(@"I am a user")]
+        public void GivenIAmAUser()
         {
-            Mock<ILogger<AuthService>> mockLogger = new();
             CreateAccountValidator createValidator = new();
             ConnectValidator connectValidator = new();
 
@@ -33,7 +34,7 @@ namespace cst_back.specs.StepDefinitions
                 .ReturnsAsync(1);
             Mock<ICryptoHelper> cryptoHelper = new();
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, createValidator, connectValidator, dbServiceMock.Object, cryptoHelper.Object);
+            Auth.AuthBase authService = new AuthService(createValidator, connectValidator, dbServiceMock.Object, cryptoHelper.Object);
             _authServer = ServersFixtures.GetAuthServer(authService, dbServiceMock);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
@@ -82,6 +83,7 @@ namespace cst_back.specs.StepDefinitions
         [When(@"I want to create my  account, I shouldn't received my id")]
         public void WhenIWantToCreateMyAccountIShouldntReceivedMyId()
         {
+            _authServer!.Dispose();
             Assert.ThrowsAny<RpcException>(() => _authClient!.CreateAccount(_createRequest));
         }
     }

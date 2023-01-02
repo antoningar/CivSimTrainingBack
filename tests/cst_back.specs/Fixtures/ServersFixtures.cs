@@ -1,6 +1,7 @@
 ﻿using cst_back.DBServices;
 using cst_back.Helpers;
 using cst_back.Interceptors;
+using cst_back.Protos;
 using cst_back.Services;
 using cst_back.Validators;
 using FluentValidation;
@@ -24,6 +25,9 @@ namespace cst_back.specs.Fixtures
                 .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(true);
 
+            Mock<IInstanceDBService> mockInstanceDBService = new();
+            Mock<IInstanceService> mockInstancesService = new();
+
             return new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
                 {
@@ -45,6 +49,31 @@ namespace cst_back.specs.Fixtures
                     app.UseEndpoints(endpoints =>
                     {
                         endpoints.MapGrpcService<AuthService>();
+                    });
+                }));
+        }
+        public static TestServer GetInstancesServer(RPCInstance.RPCInstanceBase instanceService, Mock<IInstanceDBService> mockInstanceDBService)
+        {
+            var serviceDefinition = RPCInstance.BindService(instanceService);
+
+            return new TestServer(new WebHostBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddGrpc(options =>
+                    {
+                        options.Interceptors.Add<ServerInterceptor>();
+                    });
+
+                    services.AddSingleton(mockInstanceDBService.Object);
+                    services.AddScoped<IValidator<InstancesRequest>, GetInstancesValidator>();
+                    services.AddSingleton(serviceDefinition);
+                })
+                .Configure(app =>
+                {
+                    app.UseRouting();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapGrpcService<InstanceService>();
                     });
                 }));
         }

@@ -8,7 +8,7 @@ using Grpc.Net.Client;
 using MongoDB.Driver;
 using Moq;
 
-namespace cst_back.specs.StepDefinitions
+namespace cst_back.specs.StepDefinitions.Connect
 {
     [Binding]
     public class ConnectStepDefinitions
@@ -18,10 +18,10 @@ namespace cst_back.specs.StepDefinitions
         private Microsoft.AspNetCore.TestHost.TestServer? _connectServer;
         private Auth.AuthClient? _connectClient;
 
+        [Scope(Feature = "Connect")]
         [Given(@"I am a user")]
         public void GivenIAmAUser()
         {
-            Mock<Microsoft.Extensions.Logging.ILogger<AuthService>> mockLogger = new();
             CreateAccountValidator createValidator = new();
             ConnectValidator connectValidator = new();
 
@@ -39,7 +39,7 @@ namespace cst_back.specs.StepDefinitions
                 .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(true);
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, createValidator, connectValidator, dbServiceMock.Object, cryptoHelper.Object);
+            Auth.AuthBase authService = new AuthService(createValidator, connectValidator, dbServiceMock.Object, cryptoHelper.Object);
             _connectServer = ServersFixtures.GetAuthServer(authService, dbServiceMock);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
