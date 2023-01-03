@@ -27,6 +27,19 @@ namespace cst_back.Services
             }
         }
 
+        private async Task writeInstancesToStream(List<Instance> instances, IServerStreamWriter<InstancesResponse> strean)
+        {
+            foreach (Instance instance in instances)
+            {
+                await strean.WriteAsync(new InstancesResponse()
+                {
+                    Civilization = instance.Civilization,
+                    Goal = instance.Goal,
+                    Map = instance.Map,
+                });
+            }
+        }
+
         public override async Task GetInstances(InstancesRequest request, IServerStreamWriter<InstancesResponse> responseStream, ServerCallContext context)
         {
             List<Instance> instances = new();
@@ -40,15 +53,7 @@ namespace cst_back.Services
                 throw new RpcException(new Status(StatusCode.Internal, ex.Message));
             }
 
-            foreach (Instance instance in instances)
-            {
-                await responseStream.WriteAsync(new InstancesResponse()
-                {
-                    Civilisation = instance.Civilization,
-                    Goal = instance.Goal,
-                    Map = instance.Map,
-                });
-            }
+            await writeInstancesToStream(instances, responseStream);
         }
     }
 }

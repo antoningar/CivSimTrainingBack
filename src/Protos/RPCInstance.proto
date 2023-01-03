@@ -9,11 +9,16 @@ service RPCInstance {
 }
 
 message InstancesRequest {
-	string filter = 1;
+	Filter filter = 1;
+}
+
+message Filter {
+	string type = 1;
+	string value = 2;
 }
 
 message InstancesResponse {
-	string civilisation = 1;
+	string civilization = 1;
 	string goal = 2;
 	string map = 3;
 }

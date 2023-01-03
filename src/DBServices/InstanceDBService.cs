@@ -1,7 +1,9 @@
 ﻿using cst_back.Models;
+using cst_back.Protos;
 using cst_back.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+
 
 namespace cst_back.DBServices
 {
@@ -16,14 +18,18 @@ namespace cst_back.DBServices
             _instanceCollection = mongoDatabase.GetCollection<Instance>(
                 dbSettings.Value.InstanceCollectionName);
         }
-        public async Task<List<Instance>> GetInstances(string filter)
+        public async Task<List<Instance>> GetInstances(Filter filter)
         {
-            if (string.IsNullOrEmpty(filter))
+            if (string.IsNullOrEmpty(filter.Type))
             {
                 return await _instanceCollection.Find(_ => true).ToListAsync();
             }
-
-            return new List<Instance>();
+            else
+            {
+                var builder = Builders<Instance>.Filter;
+                var rqFilter = builder.Eq(filter.Type, filter.Value);
+                return await _instanceCollection.Find(rqFilter).ToListAsync();
+            }
         }
     }
 }
