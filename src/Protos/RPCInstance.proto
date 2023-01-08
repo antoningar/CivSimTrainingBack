@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option csharp_namespace = "cst_back.Protos";
+
+package instances;
+
+service RPCInstance {
+	rpc GetInstances (InstancesRequest) returns (stream InstancesResponse);
+}
+
+message InstancesRequest {
+	Filter filter = 1;
+}
+
+message Filter {
+	string type = 1;
+	string value = 2;
+}
+
+message InstancesResponse {
+	string civilization = 1;
+	string goal = 2;
+	string map = 3;
+}

@@ -1,6 +1,7 @@
 using cst_back.DBServices;
 using cst_back.Helpers;
 using cst_back.Interceptors;
+using cst_back.Protos;
 using cst_back.Services;
 using cst_back.Settings;
 using cst_back.Validators;
@@ -22,11 +23,12 @@ var logger = new LoggerConfiguration()
 
 builder.Logging.AddSerilog(logger);
 
-builder.Services.Configure<AccountDatabaseSettings>(
-    builder.Configuration.GetSection("AccountStoreDatabase"));
+builder.Services.Configure<DatabaseSettings>(
+    builder.Configuration.GetSection("DatabaseSettings"));
 
 builder.Services.AddSingleton<IAccountDBService, AccountDBService>();
 builder.Services.AddSingleton<ICounterDBService, CounterDBService>();
+builder.Services.AddSingleton<IInstanceDBService, InstanceDBService>();
 builder.Services.AddSingleton<ICryptoHelper, CryptoHelper>();
 
 builder.Services.AddGrpc(options =>
@@ -37,6 +39,7 @@ builder.Services.AddGrpcReflection();
 
 builder.Services.AddScoped<IValidator<CreateAccountRequest>, CreateAccountValidator>();
 builder.Services.AddScoped<IValidator<ConnectRequest>, ConnectValidator>();
+builder.Services.AddScoped<IValidator<InstancesRequest>, GetInstancesValidator>();
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -49,6 +52,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 var app = builder.Build();
 
 app.MapGrpcService<AuthService>();
+app.MapGrpcService<InstanceService>();
 
 IWebHostEnvironment env = app.Environment;
 

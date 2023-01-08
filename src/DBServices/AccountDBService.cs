@@ -10,14 +10,14 @@ namespace cst_back.DBServices
         private readonly ICounterDBService _counterDBService;
         private readonly IMongoCollection<Account> _accountCollection;
 
-        public AccountDBService(IOptions<AccountDatabaseSettings> accountSettings, ICounterDBService counterDBService)
+        public AccountDBService(IOptions<DatabaseSettings> dbSettings, ICounterDBService counterDBService)
         {
-            MongoClient mongoClient = new(accountSettings.Value.ConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(accountSettings.Value.DatabaseName);
+            MongoClient mongoClient = new(dbSettings.Value.ConnectionString);
+            var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
 
             _accountCollection = mongoDatabase.GetCollection<Account>(
-                accountSettings.Value.AccountCollectionName);
-            
+                dbSettings.Value.AccountCollectionName);
+
             _counterDBService = counterDBService;
         }
 

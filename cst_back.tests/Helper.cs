@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using cst_back.Models;
+using Grpc.Core;
 using Grpc.Core.Testing;
 
 namespace cst_back.tests
@@ -18,6 +19,31 @@ namespace cst_back.tests
                 () => new WriteOptions(),
                 (writeOptions) => { });
 
+        }
+
+        public static List<Instance> GetListInstance()
+        {
+            return new List<Instance>()
+            {
+                new Instance()
+                {
+                    Civilization = "Dido",
+                    Map = "Seven Seas",
+                    Goal = "Scientific Victory"
+                },
+                new Instance()
+                {
+                    Civilization = "Dido",
+                    Map = "Seven Seas",
+                    Goal = "Cultural Victory"
+                },
+                new Instance()
+                {
+                    Civilization = "Trajan",
+                    Map = "Pangea",
+                    Goal = "Scientific Victory"
+                },
+            };
         }
     }
 }

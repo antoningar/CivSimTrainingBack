@@ -8,13 +8,13 @@ namespace cst_back.DBServices
     public class CounterDBService : ICounterDBService
     {
         private readonly IMongoCollection<Counters> _countersCollection;
-        public CounterDBService(IOptions<AccountDatabaseSettings> accountSettings)
+        public CounterDBService(IOptions<DatabaseSettings> dbSettings)
         {
-            MongoClient mongoClient = new(accountSettings.Value.ConnectionString);
-            var mongoDatabase = mongoClient.GetDatabase(accountSettings.Value.DatabaseName);
+            MongoClient mongoClient = new(dbSettings.Value.ConnectionString);
+            var mongoDatabase = mongoClient.GetDatabase(dbSettings.Value.DatabaseName);
 
             _countersCollection = mongoDatabase.GetCollection<Counters>(
-                accountSettings.Value.CounterCollectionName);
+                dbSettings.Value.CounterCollectionName);
         }
 
         private async Task<Counters> GetCountersAsync()

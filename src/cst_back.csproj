@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\Auth.proto" Link="Protos\Auth.proto" />
+    <Protobuf Include="Protos\RPCAuth.proto" Link="Protos\RPCAuth.proto" />
+    <Protobuf Include="Protos\RPCInstance.proto" Link="Protos\RPCInstance.proto" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,20 +9,17 @@ namespace cst_back.Services
 {
     public class AuthService : Auth.AuthBase, IAuthService
     {
-        private readonly ILogger<AuthService> _logger;
         private readonly IValidator<CreateAccountRequest> _createAccountValidator;
         private readonly IValidator<ConnectRequest> _connectAccountValidator;
         private readonly IAccountDBService _accountDBService;
         private readonly ICryptoHelper _cryptoHelper;
 
         public AuthService(
-            ILogger<AuthService> logger,
             IValidator<CreateAccountRequest> createAccountValidator,
             IValidator<ConnectRequest> connectValidator,
             IAccountDBService accountDBService,
             ICryptoHelper cryptoHelper)
         {
-            _logger = logger;
             _createAccountValidator = createAccountValidator;
             _connectAccountValidator = connectValidator;
             _accountDBService = accountDBService;

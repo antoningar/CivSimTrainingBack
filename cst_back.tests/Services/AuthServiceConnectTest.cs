@@ -12,16 +12,15 @@ namespace cst_back.tests.Services
     public class AuthServiceConnectTest
     {
         [Theory]
-        [InlineData("aa","aaaaaaaa")]
+        [InlineData("aa", "aaaaaaaa")]
         [InlineData("aaaa", "aaa")]
         public async Task CreateAccount_ShouldTestInputDatas(string username, string password)
         {
             var context = Helper.GetServerCallContext(nameof(IAuthService.CreateAccount));
-            Mock<ILogger<AuthService>> mockLogger = new();
             Mock<IAccountDBService> dbAccountServiceMock = new();
             Mock<ICryptoHelper> cryptoHelper = new();
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
+            Auth.AuthBase authService = new AuthService(new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
 
             ConnectRequest connectRequest = new()
             {
@@ -37,14 +36,13 @@ namespace cst_back.tests.Services
         public async Task CreateAccount_ShouldTestIfAccountDoesntExist(string username, string password)
         {
             var context = Helper.GetServerCallContext(nameof(IAuthService.CreateAccount));
-            Mock<ILogger<AuthService>> mockLogger = new();
             Mock<IAccountDBService> dbAccountServiceMock = new();
             dbAccountServiceMock
                 .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
                 .ReturnsAsync(null as Account);
             Mock<ICryptoHelper> cryptoHelper = new();
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
+            Auth.AuthBase authService = new AuthService(new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
 
             ConnectRequest connectRequest = new()
             {
@@ -65,7 +63,6 @@ namespace cst_back.tests.Services
                 AccountId = 4
             };
             var context = Helper.GetServerCallContext(nameof(IAuthService.CreateAccount));
-            Mock<ILogger<AuthService>> mockLogger = new();
             Mock<IAccountDBService> dbAccountServiceMock = new();
             dbAccountServiceMock
                 .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
@@ -75,7 +72,7 @@ namespace cst_back.tests.Services
                 .Setup(x => x.Verify(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(true);
 
-            Auth.AuthBase authService = new AuthService(mockLogger.Object, new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
+            Auth.AuthBase authService = new AuthService(new CreateAccountValidator(), new ConnectValidator(), dbAccountServiceMock.Object, cryptoHelper.Object);
 
             ConnectRequest connectRequest = new()
             {

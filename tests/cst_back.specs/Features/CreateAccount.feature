@@ -3,7 +3,7 @@
 Allow a user to create an account
 
 Scenario: Create Account
-	Given As a user
+	Given I am a user
 	And My username is "<username>"
 	And My email  is "<email>"
 	And My password is "<password>"
