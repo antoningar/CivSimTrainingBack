@@ -36,6 +36,7 @@ namespace cst_back.Services
             {
                 await strean.WriteAsync(new InstancesResponse()
                 {
+                    Id = instance.Id,
                     Civilization = instance.Civilization,
                     Goal = instance.Goal,
                     Map = instance.Map,
