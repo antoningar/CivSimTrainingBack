@@ -1,6 +1,7 @@
 ﻿using cst_back.DBServices;
 using cst_back.Models;
 using cst_back.Protos;
+using cst_back.Validators;
 using FluentValidation;
 using Grpc.Core;
 using MongoDB.Driver;
@@ -10,12 +11,14 @@ namespace cst_back.Services
     public class InstanceService : RPCInstance.RPCInstanceBase, IInstanceService
     {
         private readonly IValidator<InstancesRequest> _instanceRequestValidator;
+        private readonly IValidator<SearchInstancesRequest> _searchInstanceRequestValidator;
         private readonly IInstanceDBService _instanceDBService;
 
         public InstanceService(IValidator<InstancesRequest> instanceRequestValidator, IInstanceDBService instanceDBService)
         {
             _instanceRequestValidator = instanceRequestValidator;
             _instanceDBService = instanceDBService;
+            _searchInstanceRequestValidator = new SearchInstancesValidator();
         }
 
         private void CheckGetInstanceRequest(InstancesRequest request)
@@ -23,7 +26,7 @@ namespace cst_back.Services
             var validate = _instanceRequestValidator.Validate(request);
             if (!validate.IsValid)
             {
-                throw new RpcException(new Status(StatusCode.FailedPrecondition, "Filter not found"));
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, validate.Errors[0].ErrorMessage));
             }
         }
 
@@ -54,6 +57,29 @@ namespace cst_back.Services
             }
 
             await writeInstancesToStream(instances, responseStream);
+        }
+
+        private void CheckSearchInstancesRequest(SearchInstancesRequest request)
+        {
+            var validate = _searchInstanceRequestValidator.Validate(request);
+            if (!validate.IsValid)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, validate.Errors[0].ErrorMessage));
+            }
+        }
+
+        public override async Task SearchInstances(SearchInstancesRequest request, IServerStreamWriter<InstancesResponse> responseStream, ServerCallContext context)
+        {
+            CheckSearchInstancesRequest(request);
+            try
+            {
+                List<Instance> instances = await _instanceDBService.SearchInstances(request.Search);
+                await writeInstancesToStream(instances, responseStream);
+            }
+            catch (MongoException ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
         }
     }
 }
