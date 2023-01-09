@@ -31,5 +31,15 @@ namespace cst_back.DBServices
                 return await _instanceCollection.Find(rqFilter).ToListAsync();
             }
         }
+
+        public async Task<List<Instance>> SearchInstances(string search)
+        {
+            var builder = Builders<Instance>.Filter.Or(
+                Builders<Instance>.Filter.Where(i => i!.Civilization!.ToLower().Contains(search.ToLower())),
+                Builders<Instance>.Filter.Where(i => i!.Map!.ToLower().Contains(search.ToLower())),
+                Builders<Instance>.Filter.Where(i => i!.Goal!.ToLower().Contains(search.ToLower()))
+            );
+            return await _instanceCollection.Find(builder).ToListAsync();
+        }
     }
 }
