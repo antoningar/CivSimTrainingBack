@@ -52,7 +52,8 @@ namespace cst_back.specs.Fixtures
                     });
                 }));
         }
-        public static TestServer GetInstancesServer(RPCInstance.RPCInstanceBase instanceService, Mock<IInstanceDBService> mockInstanceDBService)
+
+        public static TestServer GetInstancesServer(RPCInstance.RPCInstanceBase instanceService, Mock<IInstanceDBService> mockInstanceDBService, Mock<ILeaderboardDBService> mockLeaderboardService)
         {
             var serviceDefinition = RPCInstance.BindService(instanceService);
 
@@ -65,7 +66,7 @@ namespace cst_back.specs.Fixtures
                     });
 
                     services.AddSingleton(mockInstanceDBService.Object);
-                    services.AddScoped<IValidator<InstancesRequest>, GetInstancesValidator>();
+                    services.AddSingleton(mockLeaderboardService.Object);
                     services.AddSingleton(serviceDefinition);
                 })
                 .Configure(app =>
@@ -75,7 +76,8 @@ namespace cst_back.specs.Fixtures
                     {
                         endpoints.MapGrpcService<InstanceService>();
                     });
-                }));
+                })
+            );
         }
     }
 }

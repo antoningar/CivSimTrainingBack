@@ -41,5 +41,10 @@ namespace cst_back.DBServices
             );
             return await _instanceCollection.Find(builder).ToListAsync();
         }
+
+        public async Task<Instance?> GetInstance(string id)
+        {
+            return await _instanceCollection.Find(x => x.Id == id).FirstAsync();
+        }
     }
 }

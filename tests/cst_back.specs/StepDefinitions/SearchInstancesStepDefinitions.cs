@@ -25,22 +25,26 @@ namespace cst_back.specs.StepDefinitions
         [Given(@"I am a user")]
         public void GivenIAmAUser()
         {
-            GetInstancesValidator getInstancesValidator = new();
-            Mock<IInstanceDBService> dbServiceMock = new();
-
-            RPCInstance.RPCInstanceBase instanceService = new InstanceService(getInstancesValidator, dbServiceMock.Object);
-            _instancesServer = ServersFixtures.GetInstancesServer(instanceService, dbServiceMock);
-            var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
-            {
-                HttpClient = _instancesServer.CreateClient()
-            });
-            _client = new RPCInstance.RPCInstanceClient(channel);
         }
 
         [Given(@"I searching instances with ""([^""]*)""")]
         public void GivenISearchingInstancesWith(string search)
         {
             _request.Search = search;
+
+            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
+            Mock<IInstanceDBService> dbServiceMock = new();
+            dbServiceMock
+                .Setup(x => x.SearchInstances(It.IsAny<string>()))
+                .ReturnsAsync((string s) => Helper.GetListInstanceBySearch(s));
+
+            RPCInstance.RPCInstanceBase instanceService = new InstanceService(dbServiceMock.Object, mockLeaderboardDBService.Object);
+            _instancesServer = ServersFixtures.GetInstancesServer(instanceService, dbServiceMock, mockLeaderboardDBService);
+            var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+            {
+                HttpClient = _instancesServer.CreateClient()
+            });
+            _client = new RPCInstance.RPCInstanceClient(channel);
         }
 
         [Scope(Feature = "SearchInstances")]

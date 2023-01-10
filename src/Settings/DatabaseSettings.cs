@@ -8,5 +8,6 @@
         public string CounterCollectionName { get; set; } = null!;
         public string CounterAccountId { get; set; } = null!;
         public string InstanceCollectionName { get; set; } = null!;
+        public string LeaderboardCollectionName { get; set; } = null!;
     }
 }
