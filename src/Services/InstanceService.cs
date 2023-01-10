@@ -12,14 +12,27 @@ namespace cst_back.Services
     {
         private readonly IValidator<InstancesRequest> _instanceRequestValidator;
         private readonly IValidator<SearchInstancesRequest> _searchInstanceRequestValidator;
-        private readonly IInstanceDBService _instanceDBService;
 
-        public InstanceService(IValidator<InstancesRequest> instanceRequestValidator, IInstanceDBService instanceDBService)
+        private readonly IInstanceDBService _instanceDBService;
+        private readonly ILeaderboardDBService _leaderboardDBService;
+
+        public InstanceService(IInstanceDBService instanceDBService, ILeaderboardDBService leaderboardDBService)
         {
-            _instanceRequestValidator = instanceRequestValidator;
-            _instanceDBService = instanceDBService;
+            _instanceRequestValidator = new GetInstancesValidator();
             _searchInstanceRequestValidator = new SearchInstancesValidator();
+            _instanceDBService = instanceDBService;
+            _leaderboardDBService = leaderboardDBService;
         }
+
+        private void CheckRequest<T>(IValidator<T> validator, T request)
+        {
+            var validate = validator.Validate(request);
+            if (!validate.IsValid)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, validate.Errors[0].ErrorMessage));
+            }
+        }
+
 
         private void CheckGetInstanceRequest(InstancesRequest request)
         {
@@ -76,6 +89,31 @@ namespace cst_back.Services
             {
                 List<Instance> instances = await _instanceDBService.SearchInstances(request.Search);
                 await writeInstancesToStream(instances, responseStream);
+            }
+            catch (MongoException ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        private async Task<Instance> GetInstance(string id)
+        {
+            Instance? instance = await _instanceDBService.GetInstance(id);
+            if (instance == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Instance not found"));
+            }
+            return instance;
+        }
+
+        public override async Task<InstancesDetailsResponse> GetInstancesDetails(InstancesDetailsRequest request, ServerCallContext context)
+        {
+            try
+            {
+                Instance instance = await GetInstance(request.Id);
+                Models.Leaderboard? leaderboard = await _leaderboardDBService.GetLeaderboard(request.Id);
+                InstanceDetails response = new(instance, leaderboard);
+                return response.InstancesDetailsResponse();
             }
             catch (MongoException ex)
             {

@@ -7,5 +7,6 @@ namespace cst_back.DBServices
     {
         public Task<List<Instance>> GetInstances(Filter filter);
         public Task<List<Instance>> SearchInstances(string search);
+        public Task<Instance?> GetInstance(string id);
     }
 }

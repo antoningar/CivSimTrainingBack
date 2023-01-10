@@ -29,6 +29,7 @@ builder.Services.Configure<DatabaseSettings>(
 builder.Services.AddSingleton<IAccountDBService, AccountDBService>();
 builder.Services.AddSingleton<ICounterDBService, CounterDBService>();
 builder.Services.AddSingleton<IInstanceDBService, InstanceDBService>();
+builder.Services.AddSingleton<ILeaderboardDBService, LeaderboardDBService>();
 builder.Services.AddSingleton<ICryptoHelper, CryptoHelper>();
 
 builder.Services.AddGrpc(options =>
@@ -39,7 +40,6 @@ builder.Services.AddGrpcReflection();
 
 builder.Services.AddScoped<IValidator<CreateAccountRequest>, CreateAccountValidator>();
 builder.Services.AddScoped<IValidator<ConnectRequest>, ConnectValidator>();
-builder.Services.AddScoped<IValidator<InstancesRequest>, GetInstancesValidator>();
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {

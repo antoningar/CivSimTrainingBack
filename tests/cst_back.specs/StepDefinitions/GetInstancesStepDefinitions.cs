@@ -31,8 +31,7 @@ namespace cst_back.specs.StepDefinitions.Instances
         [Given(@"I am a user")]
         public void GivenIAmAUser()
         {
-            GetInstancesValidator getInstancesValidator = new();
-
+            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> dbServiceMock = new();
             dbServiceMock
                 .Setup(x => x.GetInstances(It.Is<Filter>(x => string.IsNullOrWhiteSpace(x.Type))))
@@ -49,8 +48,8 @@ namespace cst_back.specs.StepDefinitions.Instances
                 .ReturnsAsync(Helper.GetListInstance().FindAll(x => x.Map == "Seven Seas"));
 
 
-            RPCInstance.RPCInstanceBase instancesService = new InstanceService(getInstancesValidator, dbServiceMock.Object);
-            _instancesServer = ServersFixtures.GetInstancesServer(instancesService, dbServiceMock);
+            RPCInstance.RPCInstanceBase instancesService = new InstanceService(dbServiceMock.Object, mockLeaderboardDBService.Object);
+            _instancesServer = ServersFixtures.GetInstancesServer(instancesService, dbServiceMock, mockLeaderboardDBService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
                 HttpClient = _instancesServer.CreateClient()

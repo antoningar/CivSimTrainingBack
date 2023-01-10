@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\cst_back.tests\cst_back.tests.csproj" />
     <ProjectReference Include="..\..\src\cst_back.csproj" />
+    <ProjectReference Include="..\cst_back.tests\cst_back.tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>

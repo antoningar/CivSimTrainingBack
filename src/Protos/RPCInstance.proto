@@ -7,6 +7,7 @@ package instances;
 service RPCInstance {
 	rpc GetInstances (InstancesRequest) returns (stream InstancesResponse);
 	rpc SearchInstances (SearchInstancesRequest) returns (stream InstancesResponse);
+	rpc GetInstancesDetails (InstancesDetailsRequest) returns (InstancesDetailsResponse);
 }
 
 message InstancesRequest {
@@ -27,4 +28,28 @@ message InstancesResponse {
 
 message SearchInstancesRequest {
 	string search = 1;
+}
+
+message InstancesDetailsRequest {
+	string id = 1;
+}
+
+message InstancesDetailsResponse {
+	string id = 1;
+	string civilization = 2;
+	string goal = 3;
+	string map = 4;
+	string creator = 5;
+	repeated string mods = 6;
+	Leaderboard leaderboard = 7;
+}
+
+message Leaderboard {
+	repeated Result results = 1;
+}
+
+message Result {
+	int32 positon = 1;
+	string username = 2;
+	string value = 3;
 }
