@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option csharp_namespace = "cst_back.Protos";
+
+package fileinfo;
+
+service RPCFileInfo {
+	rpc GetBaseInfo(stream GetInfoRequest) returns (GetBaseInfoResponse);
+	rpc GetFinalInfo(stream GetInfoRequest) returns (GetFinalInfoResponse);
+}
+
+message GetInfoRequest {
+	string Id = 1;
+	bytes File = 2;
+}
+
+message GetBaseInfoResponse {
+	MapInfo MapInfo = 1;
+}
+
+message GetFinalInfoResponse {
+	MapInfo MapInfo = 1;
+	GameStats GameStats = 2;
+}
+
+message MapInfo {
+	string Civilization = 1;
+	int32 Turn = 2;
+	string Map = 3;
+	repeated string Mods = 4;
+}
+
+message GameStats  {
+	float Science = 1;
+	float Culture = 2;
+	float Food = 3;
+	float Production = 4;
+	float Faith = 5;
+	float Gold =  6;
+}

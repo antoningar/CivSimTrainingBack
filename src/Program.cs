@@ -53,6 +53,7 @@ var app = builder.Build();
 
 app.MapGrpcService<AuthService>();
 app.MapGrpcService<InstanceService>();
+app.MapGrpcService<FileInfoService>();
 
 IWebHostEnvironment env = app.Environment;
 

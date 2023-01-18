@@ -20,6 +20,7 @@
   <ItemGroup>
     <Protobuf Include="Protos\RPCAuth.proto" Link="Protos\RPCAuth.proto" />
     <Protobuf Include="Protos\RPCInstance.proto" Link="Protos\RPCInstance.proto" />
+	  <Protobuf Include="Protos\RPCFileInfo.proto" Link="Protos\RPCFileInfo.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,4 +33,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="tmp\" />
+  </ItemGroup>
 </Project>
