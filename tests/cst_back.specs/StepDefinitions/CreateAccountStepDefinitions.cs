@@ -7,12 +7,13 @@ using cst_back.Validators;
 using Grpc.Core;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace cst_back.specs.StepDefinitions.Create
 {
     [Binding]
+    [Scope(Feature = "CreateAccount")]
+    [Scope(Feature = "CreateAccountError")]
     public class CreateAccountStepDefinitions
     {
         private readonly CreateAccountRequest _createRequest = new();

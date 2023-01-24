@@ -170,5 +170,16 @@ namespace cst_back.tests
 
             return new InstanceService(instanceDBService,leaderboardDBService,accountDBService, fileHelper, fileDBService);
         }
+
+        public static FileInfoService GetFileInfoService(
+            Mock<IFileHelper>? mockFileHelper = null,
+            Mock<IAccountDBService>? mockAccountDBService = null
+            )
+        {
+            IFileHelper fileHelperService = (mockFileHelper == null) ? new Mock<IFileHelper>().Object : mockFileHelper!.Object;
+            IAccountDBService accountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>().Object : mockAccountDBService!.Object;
+
+            return new FileInfoService(fileHelperService, accountDBService);
+        }
     }
 }

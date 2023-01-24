@@ -7,6 +7,16 @@ package fileinfo;
 service RPCFileInfo {
 	rpc GetBaseInfo(stream GetInfoRequest) returns (GetBaseInfoResponse);
 	rpc GetFinalInfo(stream GetInfoRequest) returns (GetFinalInfoResponse);
+
+	rpc DeleteTmpFiles(DeleteTmpFilesRequest) returns (DeleteTmpFilesResponse);
+}
+
+message DeleteTmpFilesRequest {
+	string Username = 1;
+}
+
+message DeleteTmpFilesResponse {
+	int32 NumberDeleted = 1;
 }
 
 message GetInfoRequest {

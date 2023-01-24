@@ -1,16 +1,21 @@
-﻿using cst_back.Helpers;
+﻿using cst_back.DBServices;
+using cst_back.Helpers;
+using cst_back.Models;
 using cst_back.Protos;
 using Grpc.Core;
+using MongoDB.Driver;
 
 namespace cst_back.Services
 {
     public class FileInfoService : RPCFileInfo.RPCFileInfoBase, IFileInfoService
     {
         private IFileHelper _fileHelper;
+        private IAccountDBService _accounDBService;
 
-        public FileInfoService(IFileHelper fileHelper)
+        public FileInfoService(IFileHelper fileHelper, IAccountDBService accountDBService)
         {
             _fileHelper = fileHelper;
+            _accounDBService = accountDBService;
         }
 
         public override async Task<GetBaseInfoResponse> GetBaseInfo(IAsyncStreamReader<GetInfoRequest> requestStream, ServerCallContext context)
@@ -79,6 +84,30 @@ namespace cst_back.Services
             result.Mods.Add("BBG");
 
             return Task.FromResult(result);
+        }
+
+        private async Task CheckUsernameExist(string username)
+        {
+            Account? account = await _accounDBService.GetAccountByUsernameAsync(username);
+            if (account == null)
+                throw new RpcException(new Status(StatusCode.NotFound, "Account not found"));
+        }
+
+        public override async Task<DeleteTmpFilesResponse> DeleteTmpFiles(DeleteTmpFilesRequest request, ServerCallContext context)
+        {
+            DeleteTmpFilesResponse response = new();
+            
+            try
+            {
+                await CheckUsernameExist(request.Username);
+                response.NumberDeleted = _fileHelper.DeleteTmpFileByUsername(request.Username);
+            }
+            catch (MongoException ex) 
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+
+            return response;
         }
     }
 }
