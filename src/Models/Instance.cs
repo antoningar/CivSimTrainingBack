@@ -13,6 +13,6 @@ namespace cst_back.Models
         public string? Goal { get; set; }
         public string? Map { get; set; }
         public string? Creator { get; set; }
-        public string[] Mods { get; set; }
+        public string[]? Mods { get; set; }
     }
 }

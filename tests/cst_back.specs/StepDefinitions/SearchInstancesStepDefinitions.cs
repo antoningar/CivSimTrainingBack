@@ -34,11 +34,12 @@ namespace cst_back.specs.StepDefinitions
 
             Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> dbServiceMock = new();
+            Mock<IAccountDBService> mockAccountDbService = new();
             dbServiceMock
                 .Setup(x => x.SearchInstances(It.IsAny<string>()))
                 .ReturnsAsync((string s) => Helper.GetListInstanceBySearch(s));
 
-            RPCInstance.RPCInstanceBase instanceService = new InstanceService(dbServiceMock.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase instanceService = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService);
             _instancesServer = ServersFixtures.GetInstancesServer(instanceService, dbServiceMock, mockLeaderboardDBService);
             var channel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
             {

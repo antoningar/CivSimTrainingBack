@@ -1,7 +1,11 @@
-﻿using cst_back.Models;
+﻿using cst_back.DBServices;
+using cst_back.Helpers;
+using cst_back.Models;
 using cst_back.Protos;
+using cst_back.Services;
 using Grpc.Core;
 using Grpc.Core.Testing;
+using Moq;
 
 namespace cst_back.tests
 {
@@ -148,6 +152,23 @@ namespace cst_back.tests
                     }
                 }
             };
+        }
+
+        public static InstanceService GetInstanceService(
+            Mock<IInstanceDBService>? mockInstanceDBService = null,
+            Mock<ILeaderboardDBService>? mockLeaderboardDBService = null,
+            Mock<IAccountDBService>? mockAccountDBService = null,
+            Mock<IFileHelper>? mockFileHelper = null,
+            Mock<IFileDBService>? mockFileDBService = null
+            )
+        {
+            IInstanceDBService instanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>().Object : mockInstanceDBService!.Object;
+            ILeaderboardDBService leaderboardDBService = (mockLeaderboardDBService == null) ? new Mock<ILeaderboardDBService>().Object: mockLeaderboardDBService!.Object;
+            IAccountDBService accountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>().Object : mockAccountDBService!.Object;
+            IFileHelper fileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>().Object : mockFileHelper!.Object;
+            IFileDBService fileDBService = (mockFileDBService == null) ? new  Mock<IFileDBService>().Object : mockFileDBService!.Object;
+
+            return new InstanceService(instanceDBService,leaderboardDBService,accountDBService, fileHelper, fileDBService);
         }
     }
 }

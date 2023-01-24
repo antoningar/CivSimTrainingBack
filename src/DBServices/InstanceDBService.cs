@@ -4,7 +4,6 @@ using cst_back.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-
 namespace cst_back.DBServices
 {
     public class InstanceDBService : IInstanceDBService
@@ -45,6 +44,12 @@ namespace cst_back.DBServices
         public async Task<Instance?> GetInstance(string id)
         {
             return await _instanceCollection.Find(x => x.Id == id).FirstAsync();
+        }
+
+        public async Task<string?> InsertInstance(Instance instance)
+        {
+            await _instanceCollection.InsertOneAsync(instance);
+            return instance.Id;
         }
     }
 }

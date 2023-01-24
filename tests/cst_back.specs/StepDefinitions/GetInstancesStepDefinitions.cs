@@ -36,7 +36,6 @@ namespace cst_back.specs.StepDefinitions.Instances
             dbServiceMock
                 .Setup(x => x.GetInstances(It.Is<Filter>(x => string.IsNullOrWhiteSpace(x.Type))))
                 .ReturnsAsync(Helper.GetListInstance());
-            
             dbServiceMock
                 .Setup(x => x.GetInstances(new Filter() { Type= "Civilization", Value="Dido" }))
                 .ReturnsAsync(Helper.GetListInstance().FindAll(x => x.Civilization == "Dido"));
@@ -48,7 +47,7 @@ namespace cst_back.specs.StepDefinitions.Instances
                 .ReturnsAsync(Helper.GetListInstance().FindAll(x => x.Map == "Seven Seas"));
 
 
-            RPCInstance.RPCInstanceBase instancesService = new InstanceService(dbServiceMock.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase instancesService = Helper.GetInstanceService(mockInstanceDBService: dbServiceMock);
             _instancesServer = ServersFixtures.GetInstancesServer(instancesService, dbServiceMock, mockLeaderboardDBService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {

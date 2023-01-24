@@ -28,11 +28,9 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 }
             };
 
-            Mock<IInstanceDBService> mockInstanceDBService = new();
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService();
 
             try
             {
@@ -57,14 +55,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 }
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.GetInstances(It.IsAny<Filter>()))
                 .ThrowsAsync(new MongoException("error"));
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             try
             {
@@ -93,7 +90,6 @@ namespace cst_back.tests.Services.InstanceServiceTest
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
             mockStreamWriter.Setup(x => x.WriteAsync(It.IsAny<InstancesResponse>()));
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.GetInstances(It.IsAny<Filter>()))
@@ -107,7 +103,7 @@ namespace cst_back.tests.Services.InstanceServiceTest
                     }
                 });
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             await rpcInstance.GetInstances(request, mockStreamWriter.Object, context);
 
@@ -128,14 +124,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 }
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.GetInstances(It.IsAny<Filter>()))
                 .ReturnsAsync(Helper.GetListInstance());
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             await rpcInstance.GetInstances(request, mockStreamWriter.Object, context);
 
@@ -156,14 +151,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 }
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.GetInstances(It.IsAny<Filter>()))
                 .ReturnsAsync(Helper.GetListInstance());
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             await rpcInstance.GetInstances(request, mockStreamWriter.Object, context);
 
@@ -184,14 +178,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 }
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.GetInstances(It.IsAny<Filter>()))
                 .ReturnsAsync(Helper.GetListInstance());
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             await rpcInstance.GetInstances(request, mockStreamWriter.Object, context);
 

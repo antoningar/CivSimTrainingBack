@@ -6,6 +6,7 @@ namespace cst_back.DBServices
     {
         public Task<Account?> GetAccountByUsernameAsync(string username);
         public Task<Account?> GetAccountByEmailAsync(string email);
+        public Task<Account?> GetAccountByUserId(string userId);
         public Task<int?> InsertAccountAsync(Account account);
     }
 }

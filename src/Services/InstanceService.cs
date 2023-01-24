@@ -1,4 +1,5 @@
 ﻿using cst_back.DBServices;
+using cst_back.Helpers;
 using cst_back.Models;
 using cst_back.Protos;
 using cst_back.Validators;
@@ -12,16 +13,24 @@ namespace cst_back.Services
     {
         private readonly IValidator<InstancesRequest> _instanceRequestValidator;
         private readonly IValidator<SearchInstancesRequest> _searchInstanceRequestValidator;
+        private readonly IValidator<string> _goalValidator;
 
         private readonly IInstanceDBService _instanceDBService;
         private readonly ILeaderboardDBService _leaderboardDBService;
+        private readonly IAccountDBService _accountDBService;
+        private readonly IFileHelper _fileHelper;
+        private readonly IFileDBService _fileDBService;
 
-        public InstanceService(IInstanceDBService instanceDBService, ILeaderboardDBService leaderboardDBService)
+        public InstanceService(IInstanceDBService instanceDBService, ILeaderboardDBService leaderboardDBService, IAccountDBService accountDBService, IFileHelper fileHelper, IFileDBService fileDBService)
         {
             _instanceRequestValidator = new GetInstancesValidator();
             _searchInstanceRequestValidator = new SearchInstancesValidator();
+            _goalValidator = new GoalValidator();
             _instanceDBService = instanceDBService;
             _leaderboardDBService = leaderboardDBService;
+            _accountDBService = accountDBService;
+            _fileHelper = fileHelper;
+            _fileDBService = fileDBService;
         }
 
         private void CheckRequest<T>(IValidator<T> validator, T request)
@@ -32,7 +41,6 @@ namespace cst_back.Services
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, validate.Errors[0].ErrorMessage));
             }
         }
-
 
         private void CheckGetInstanceRequest(InstancesRequest request)
         {
@@ -119,6 +127,77 @@ namespace cst_back.Services
             {
                 throw new RpcException(new Status(StatusCode.Internal, ex.Message));
             }
+        }
+
+        private async Task CheckCreateInstancePreconditions(CreateInstanceRequest request)
+        {
+            Account? account = null;
+            try
+            {
+                account = await _accountDBService.GetAccountByUsernameAsync(request.UserId);
+            }
+            catch (MongoException ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+
+            if (account == null)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "Account not found"));
+            }
+
+            var goalValidation = _goalValidator.Validate(request.Goal);
+            if (!goalValidation.IsValid)
+            {
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, goalValidation.Errors.First().ErrorMessage));
+            }
+
+            if (!_fileHelper.IsInstanceTmpFilesExist(request.UserId))
+                throw new RpcException(new Status(StatusCode.FailedPrecondition, "Saves not found"));
+        }
+
+        private async Task<string?> InsertInstance(CreateInstanceRequest request)
+        {
+            try
+            {
+                Instance? instance = await _fileHelper.GetInstanceFromFile(request.UserId);
+                Account? account = await _accountDBService.GetAccountByUsernameAsync(request.UserId);
+                instance.Creator = account!.Username;
+                instance.Goal = request.Goal;
+                return await _instanceDBService.InsertInstance(instance);
+            }
+            catch (MongoException ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal,ex.Message));
+            }
+            catch(Exception ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        private async Task InsertFile(string userId, string instanceId)
+        {
+            try
+            {
+                await _fileDBService.SaveFile(userId, instanceId);
+            }
+            catch (MongoException ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
+        }
+
+        public override async Task<CreateInstanceResponse> CreateInstance(CreateInstanceRequest request, ServerCallContext context)
+        {
+            await CheckCreateInstancePreconditions(request);
+            string? id = await InsertInstance(request);
+            await InsertFile(request.UserId, id!);
+            
+            return new CreateInstanceResponse
+            {
+                Id = id
+            };
         }
     }
 }

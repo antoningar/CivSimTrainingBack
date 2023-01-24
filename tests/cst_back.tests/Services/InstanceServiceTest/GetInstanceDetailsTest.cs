@@ -20,14 +20,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
             {
                 Id = "12",
             };
-
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
+            
             Mock<IInstanceDBService> mockDbService = new();
             mockDbService.
                 Setup(x => x.GetInstance(It.IsAny<string>()))
                 .ThrowsAsync(new MongoException(""));
 
-            InstanceService service = new(mockDbService.Object, mockLeaderboardDBService.Object);
+            InstanceService service = Helper.GetInstanceService(mockInstanceDBService: mockDbService);
 
             try
             {
@@ -49,13 +48,12 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 Id = "12",
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockDbService = new();
             mockDbService.
                 Setup(x => x.GetInstance(It.IsAny<string>()))
                 .ReturnsAsync((Instance)null);
 
-            InstanceService service = new(mockDbService.Object, mockLeaderboardDBService.Object);
+            InstanceService service = Helper.GetInstanceService(mockInstanceDBService: mockDbService);
 
             try
             {
@@ -78,15 +76,15 @@ namespace cst_back.tests.Services.InstanceServiceTest
             };
 
             Mock<IInstanceDBService> mockDbService = new();
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             mockDbService.
                 Setup(x => x.GetInstance(It.IsAny<string>()))
                 .ReturnsAsync(Helper.GetInstance());
+            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             mockLeaderboardDBService.
                 Setup(x => x.GetLeaderboard(It.IsAny<string>()))
                 .ReturnsAsync((Models.Leaderboard)null);
 
-            InstanceService service = new(mockDbService.Object, mockLeaderboardDBService.Object);
+            InstanceService service = Helper.GetInstanceService(mockLeaderboardDBService: mockLeaderboardDBService, mockInstanceDBService: mockDbService);
 
             InstancesDetailsResponse response = await service.GetInstancesDetails(request, context);
 
@@ -112,7 +110,7 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 Setup(x => x.GetLeaderboard(It.IsAny<string>()))
                 .ReturnsAsync(Helper.GetLeaderBoard());
 
-            InstanceService service = new(mockDbService.Object, mockLeaderboardDBService.Object);
+            InstanceService service = Helper.GetInstanceService(mockInstanceDBService: mockDbService, mockLeaderboardDBService: mockLeaderboardDBService);
 
             InstancesDetailsResponse response = await service.GetInstancesDetails(request, context);
 

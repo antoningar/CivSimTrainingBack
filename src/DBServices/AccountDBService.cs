@@ -45,5 +45,10 @@ namespace cst_back.DBServices
         {
             return await _accountCollection.Find(x => x.Username == username && BCrypt.Net.BCrypt.Verify(x.Password, password, false, BCrypt.Net.HashType.SHA384) == true).FirstOrDefaultAsync();
         }
+
+        public async Task<Account?> GetAccountByUserId(string userId)
+        {
+            return await _accountCollection.Find(x => x.Id == userId).FirstOrDefaultAsync();
+        }
     }
 }
