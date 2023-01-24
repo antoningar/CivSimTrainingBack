@@ -1,7 +1,6 @@
 using cst_back.DBServices;
 using cst_back.Helpers;
 using cst_back.Interceptors;
-using cst_back.Protos;
 using cst_back.Services;
 using cst_back.Settings;
 using cst_back.Validators;
@@ -31,6 +30,8 @@ builder.Services.AddSingleton<ICounterDBService, CounterDBService>();
 builder.Services.AddSingleton<IInstanceDBService, InstanceDBService>();
 builder.Services.AddSingleton<ILeaderboardDBService, LeaderboardDBService>();
 builder.Services.AddSingleton<ICryptoHelper, CryptoHelper>();
+builder.Services.AddSingleton<IFileHelper, FileHelper>();
+builder.Services.AddSingleton<IFileDBService, FileDBService>();
 
 builder.Services.AddGrpc(options =>
 {

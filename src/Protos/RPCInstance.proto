@@ -8,6 +8,17 @@ service RPCInstance {
 	rpc GetInstances (InstancesRequest) returns (stream InstancesResponse);
 	rpc SearchInstances (SearchInstancesRequest) returns (stream InstancesResponse);
 	rpc GetInstancesDetails (InstancesDetailsRequest) returns (InstancesDetailsResponse);
+
+	rpc CreateInstance (CreateInstanceRequest) returns (CreateInstanceResponse);
+}
+
+message CreateInstanceRequest {
+	string UserId = 1;
+	string Goal = 2;
+}
+
+message CreateInstanceResponse {
+	string Id = 1;
 }
 
 message InstancesRequest {

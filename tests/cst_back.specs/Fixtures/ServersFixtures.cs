@@ -53,8 +53,20 @@ namespace cst_back.specs.Fixtures
                 }));
         }
 
-        public static TestServer GetInstancesServer(RPCInstance.RPCInstanceBase instanceService, Mock<IInstanceDBService> mockInstanceDBService, Mock<ILeaderboardDBService> mockLeaderboardService)
+        public static TestServer GetInstancesServer(
+            RPCInstance.RPCInstanceBase instanceService,
+            Mock<IInstanceDBService>? mockInstanceDBService= null,
+            Mock<ILeaderboardDBService>? mockLeaderboardService  = null,
+            Mock<IAccountDBService>? mockAccountDBService = null,
+            Mock<IFileHelper>? mockFileHelper = null,
+            Mock<IFileDBService>? mockFileDBService= null)
         {
+            mockInstanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>() : mockInstanceDBService;
+            mockLeaderboardService = (mockLeaderboardService == null) ? new Mock<ILeaderboardDBService>() : mockLeaderboardService;
+            mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
+            mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
+            mockFileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>() : mockFileDBService;
+
             var serviceDefinition = RPCInstance.BindService(instanceService);
 
             return new TestServer(new WebHostBuilder()
@@ -67,6 +79,9 @@ namespace cst_back.specs.Fixtures
 
                     services.AddSingleton(mockInstanceDBService.Object);
                     services.AddSingleton(mockLeaderboardService.Object);
+                    services.AddSingleton(mockAccountDBService.Object);
+                    services.AddSingleton(mockFileHelper.Object);
+                    services.AddSingleton(mockFileDBService.Object);
                     services.AddSingleton(serviceDefinition);
                 })
                 .Configure(app =>

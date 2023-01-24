@@ -22,11 +22,9 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 Search = search
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
-            Mock<IInstanceDBService> mockInstanceDBService = new();
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService();
 
             try
             {
@@ -49,14 +47,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 Search = search
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.SearchInstances(It.IsAny<string>()))
                 .ThrowsAsync(new MongoException(""));
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             try
             {
@@ -80,14 +77,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
                 Search = search
             };
 
-            Mock<ILeaderboardDBService> mockLeaderboardDBService = new();
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.SearchInstances(search))
                 .ReturnsAsync(Helper.GetListInstanceBySearch(search));
             Mock<IServerStreamWriter<InstancesResponse>> mockStreamWriter = new();
 
-            RPCInstance.RPCInstanceBase rpcInstance = new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object);
+            RPCInstance.RPCInstanceBase rpcInstance = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
 
             await rpcInstance.SearchInstances(request, mockStreamWriter.Object, context);
 
