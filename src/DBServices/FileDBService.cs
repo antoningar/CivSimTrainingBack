@@ -28,7 +28,7 @@ namespace cst_back.DBServices
             string[] files = Directory.GetFiles(TMP_PATH);
             string filename = files.First(x => x.Contains(userId));
             byte[] fileBytes  = File.ReadAllBytes(filename);
-            await _bucket.UploadFromBytesAsync(filename, fileBytes);
+            await _bucket.UploadFromBytesAsync(filename.Replace(".Civ6Save", instanceId  + ".Civ6Save"), fileBytes);
         }
     }
 }
