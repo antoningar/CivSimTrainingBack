@@ -13,7 +13,7 @@ service RPCInstance {
 }
 
 message CreateInstanceRequest {
-	string UserId = 1;
+	string Username = 1;
 	string Goal = 2;
 }
 

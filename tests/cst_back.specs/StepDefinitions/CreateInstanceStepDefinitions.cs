@@ -24,8 +24,8 @@ namespace cst_back.specs.StepDefinitions
         {
             Mock<IAccountDBService> mockAccountDBService = new();
             mockAccountDBService
-                .Setup(x => x.GetAccountByUserId(It.IsAny<string>()))
-                .ReturnsAsync(new Models.Account() { Id = "123", Username  = "aaa" });
+                .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Account() { Id = "123", Username  = "aaa" });
 
             Mock<IFileHelper> mockFileHelper= new();
             mockFileHelper
@@ -49,10 +49,10 @@ namespace cst_back.specs.StepDefinitions
             _client = new RPCInstance.RPCInstanceClient(channel);
         }
 
-        [Given(@"my userid is ""([^""]*)""")]
-        public void GivenMyUseridIs(string id)
+        [Given(@"my username is ""([^""]*)""")]
+        public void GivenMyUsernameIs(string username)
         {
-            _request.UserId = id;
+            _request.Username = username;
         }
 
         [Given(@"my goal is ""([^""]*)""")]
