@@ -24,8 +24,8 @@ namespace cst_back.specs.StepDefinitions
         {
             Mock<IAccountDBService> mockAccountDBService = new();
             mockAccountDBService
-                .Setup(x => x.GetAccountByUserId(It.IsAny<string>()))
-                .ReturnsAsync(new Models.Account() { Id = "123", Username  = "aaa" });
+                .Setup(x => x.GetAccountByUsernameAsync(It.IsAny<string>()))
+                .ReturnsAsync(new Account() { Id = "123", Username  = "aaa" });
 
             Mock<IFileHelper> mockFileHelper= new();
             mockFileHelper
@@ -40,8 +40,7 @@ namespace cst_back.specs.StepDefinitions
                 .Setup(x => x.InsertInstance(It.IsAny<Instance>()))
                 .ReturnsAsync("12");
 
-            RPCInstance.RPCInstanceBase instancesService = Helper.GetInstanceService(mockInstanceDBService: mockInstanceDBService);
-            _server = ServersFixtures.GetInstancesServer(instanceService: instancesService, mockAccountDBService: mockAccountDBService, mockFileHelper: mockFileHelper, mockInstanceDBService: mockInstanceDBService);
+            _server = ServersFixtures.GetInstancesServer(mockAccountDBService: mockAccountDBService, mockFileHelper: mockFileHelper, mockInstanceDBService: mockInstanceDBService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
                 HttpClient = _server.CreateClient()
@@ -49,10 +48,10 @@ namespace cst_back.specs.StepDefinitions
             _client = new RPCInstance.RPCInstanceClient(channel);
         }
 
-        [Given(@"my userid is ""([^""]*)""")]
-        public void GivenMyUseridIs(string id)
+        [Given(@"my username is ""([^""]*)""")]
+        public void GivenMyUsernameIs(string username)
         {
-            _request.UserId = id;
+            _request.Username = username;
         }
 
         [Given(@"my goal is ""([^""]*)""")]

@@ -11,5 +11,6 @@ namespace cst_back.Helpers
         public bool IsInstanceTmpFilesExist(string userId);
 
         public Task<Instance> GetInstanceFromFile(string filePath);
+        public int DeleteTmpFileByUsername(string username);
     }
 }

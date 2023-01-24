@@ -18,10 +18,10 @@ namespace cst_back.Helpers
             });
         }
 
-        public bool IsInstanceTmpFilesExist(string userId)
+        public bool IsInstanceTmpFilesExist(string username)
         {
             string[] files = Directory.GetFiles(TMP_PATH);
-            return files.Any(x => x.Contains(userId, StringComparison.OrdinalIgnoreCase));
+            return files.Any(x => x.Contains("_" + username + "_", StringComparison.OrdinalIgnoreCase));
         }
 
         public async Task<FileStream?> WriteFile(IAsyncStreamReader<GetInfoRequest> requestStream, string suffix)
@@ -46,6 +46,21 @@ namespace cst_back.Helpers
         {
             string filename = string.Join("_", Path.GetRandomFileName(), userId, suffix, ".Civ6Save");
             return File.Create(TMP_PATH + filename); ;
+        }
+
+        public int DeleteTmpFileByUsername(string username)
+        {
+            int count = 0;
+            string[] files = Directory.GetFiles(TMP_PATH);
+            foreach (string file in files) 
+            {
+                if (file.ToLower().Contains("_"+ username.ToLower() + "_"))
+                {
+                    File.Delete(file);
+                    count++;
+                }
+            }
+            return count;
         }
     }
 }

@@ -17,8 +17,6 @@ namespace cst_back.specs.Fixtures
     {
         public static TestServer GetAuthServer(Auth.AuthBase authService, Mock<IAccountDBService> mockAccountDBService)
         {
-            var serviceDefinition = Auth.BindService(authService);
-
             Mock<ICounterDBService> mockCounterDBService = new();
             Mock<ICryptoHelper> mockCryptoHelper = new();
             mockCryptoHelper
@@ -41,7 +39,6 @@ namespace cst_back.specs.Fixtures
                     services.AddSingleton(mockCryptoHelper.Object);
                     services.AddScoped<IValidator<CreateAccountRequest>, CreateAccountValidator>();
                     services.AddScoped<IValidator<ConnectRequest>, ConnectValidator>();
-                    services.AddSingleton(serviceDefinition);
                 })
                 .Configure(app =>
                 {
@@ -54,7 +51,6 @@ namespace cst_back.specs.Fixtures
         }
 
         public static TestServer GetInstancesServer(
-            RPCInstance.RPCInstanceBase instanceService,
             Mock<IInstanceDBService>? mockInstanceDBService= null,
             Mock<ILeaderboardDBService>? mockLeaderboardService  = null,
             Mock<IAccountDBService>? mockAccountDBService = null,
@@ -66,8 +62,6 @@ namespace cst_back.specs.Fixtures
             mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
             mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
             mockFileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>() : mockFileDBService;
-
-            var serviceDefinition = RPCInstance.BindService(instanceService);
 
             return new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
@@ -82,7 +76,6 @@ namespace cst_back.specs.Fixtures
                     services.AddSingleton(mockAccountDBService.Object);
                     services.AddSingleton(mockFileHelper.Object);
                     services.AddSingleton(mockFileDBService.Object);
-                    services.AddSingleton(serviceDefinition);
                 })
                 .Configure(app =>
                 {
@@ -90,6 +83,35 @@ namespace cst_back.specs.Fixtures
                     app.UseEndpoints(endpoints =>
                     {
                         endpoints.MapGrpcService<InstanceService>();
+                    });
+                })
+            );
+        }
+
+        public static TestServer GetFileInfoServer(
+            Mock<IFileHelper>? mockFileHelper = null,
+            Mock<IAccountDBService>? mockAccountDBService = null)
+        {
+            mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
+            mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
+
+            return new TestServer(new WebHostBuilder()
+                .ConfigureServices(services =>
+                {
+                    services.AddGrpc(options =>
+                    {
+                        options.Interceptors.Add<ServerInterceptor>();
+                    });
+
+                    services.AddSingleton(mockFileHelper.Object);
+                    services.AddSingleton(mockAccountDBService.Object);
+                })
+                .Configure(app =>
+                {
+                    app.UseRouting();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapGrpcService<FileInfoService>();
                     });
                 })
             );

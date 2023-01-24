@@ -34,8 +34,7 @@ namespace cst_back.specs.StepDefinitions
                 .Setup(x => x.GetInstance(It.IsAny<string>()))
                 .ReturnsAsync(Helper.GetInstance());
 
-            RPCInstance.RPCInstanceBase instancesService = Helper.GetInstanceService(mockInstanceDBService: dbServiceMock, mockLeaderboardDBService: mockLeaderboardDBService);
-            _instancesServer = ServersFixtures.GetInstancesServer(instancesService, dbServiceMock, mockLeaderboardDBService);
+            _instancesServer = ServersFixtures.GetInstancesServer(dbServiceMock, mockLeaderboardDBService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
                 HttpClient = _instancesServer.CreateClient()

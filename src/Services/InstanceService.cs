@@ -134,7 +134,7 @@ namespace cst_back.Services
             Account? account = null;
             try
             {
-                account = await _accountDBService.GetAccountByUsernameAsync(request.UserId);
+                account = await _accountDBService.GetAccountByUsernameAsync(request.Username);
             }
             catch (MongoException ex)
             {
@@ -152,7 +152,7 @@ namespace cst_back.Services
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, goalValidation.Errors.First().ErrorMessage));
             }
 
-            if (!_fileHelper.IsInstanceTmpFilesExist(request.UserId))
+            if (!_fileHelper.IsInstanceTmpFilesExist(request.Username))
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, "Saves not found"));
         }
 
@@ -160,8 +160,8 @@ namespace cst_back.Services
         {
             try
             {
-                Instance? instance = await _fileHelper.GetInstanceFromFile(request.UserId);
-                Account? account = await _accountDBService.GetAccountByUsernameAsync(request.UserId);
+                Instance? instance = await _fileHelper.GetInstanceFromFile(request.Username);
+                Account? account = await _accountDBService.GetAccountByUsernameAsync(request.Username);
                 instance.Creator = account!.Username;
                 instance.Goal = request.Goal;
                 return await _instanceDBService.InsertInstance(instance);
@@ -192,7 +192,7 @@ namespace cst_back.Services
         {
             await CheckCreateInstancePreconditions(request);
             string? id = await InsertInstance(request);
-            await InsertFile(request.UserId, id!);
+            await InsertFile(request.Username, id!);
             
             return new CreateInstanceResponse
             {

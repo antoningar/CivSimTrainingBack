@@ -18,13 +18,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
         {
             CreateInstanceRequest request = new()
             {
-                UserId = "userId",
+                Username = "userId",
                 Goal = "Max Science turn 50"
             };
 
             Mock<IAccountDBService> mockAccountDbService = new();
             mockAccountDbService
-                .Setup(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)))
                 .ThrowsAsync(new MongoException(""));
 
             InstanceService service = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService);
@@ -36,7 +36,7 @@ namespace cst_back.tests.Services.InstanceServiceTest
             }
             catch (RpcException ex)
             {
-                mockAccountDbService.Verify(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)), Times.Once);
+                mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.Once);
                 Assert.Equal(StatusCode.Internal, ex.StatusCode);
             }
         }
@@ -46,13 +46,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
         {
             CreateInstanceRequest request = new()
             {
-                UserId = "userId",
+                Username = "userId",
                 Goal = "Max Science turn 50"
             };
 
             Mock<IAccountDBService> mockAccountDbService = new();
             mockAccountDbService
-                .Setup(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)))
                 .ReturnsAsync((Account)null);
 
             InstanceService service = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService);
@@ -64,7 +64,7 @@ namespace cst_back.tests.Services.InstanceServiceTest
             }
             catch (RpcException ex)
             {
-                mockAccountDbService.Verify(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)), Times.Once);
+                mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.Once);
                 Assert.Equal(StatusCode.FailedPrecondition, ex.StatusCode);
             }
         }
@@ -74,13 +74,13 @@ namespace cst_back.tests.Services.InstanceServiceTest
         {
             CreateInstanceRequest request = new()
             {
-                UserId = "userId",
+                Username = "username",
                 Goal = "okletsgo"
             };
 
             Mock<IAccountDBService> mockAccountDbService = new();
             mockAccountDbService
-                .Setup(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)))
                 .ReturnsAsync(new Account() { Id = "123"});
 
             InstanceService service = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService);
@@ -92,7 +92,7 @@ namespace cst_back.tests.Services.InstanceServiceTest
             }
             catch (RpcException ex)
             {
-                mockAccountDbService.Verify(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)), Times.Once);
+                mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.Once);
                 Assert.Equal(StatusCode.FailedPrecondition, ex.StatusCode);
             }
         }
@@ -102,17 +102,17 @@ namespace cst_back.tests.Services.InstanceServiceTest
         {
             CreateInstanceRequest request = new()
             {
-                UserId = "userId",
+                Username = "username",
                 Goal = "Max science turn 60"
             };
 
             Mock<IAccountDBService> mockAccountDbService = new();
             mockAccountDbService
-                .Setup(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)))
                 .ReturnsAsync(new Account() { Id = "123" });
             Mock<IFileHelper> mockFileHelper = new();
             mockFileHelper
-                .Setup(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.Username)))
                 .Returns(false);
 
             InstanceService service = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService, mockFileHelper: mockFileHelper);
@@ -124,8 +124,8 @@ namespace cst_back.tests.Services.InstanceServiceTest
             }
             catch (RpcException ex)
             {
-                mockAccountDbService.Verify(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)), Times.Once);
-                mockFileHelper.Verify(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.UserId)), Times.Once);
+                mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.Once);
+                mockFileHelper.Verify(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.Username)), Times.Once);
                 Assert.Equal(StatusCode.FailedPrecondition, ex.StatusCode);
             }
         }
@@ -135,7 +135,7 @@ namespace cst_back.tests.Services.InstanceServiceTest
         {
             CreateInstanceRequest request = new()
             {
-                UserId = "userId",
+                Username = "userId",
                 Goal = "Max science turn 60"
             };
 
@@ -143,18 +143,18 @@ namespace cst_back.tests.Services.InstanceServiceTest
 
             Mock<IAccountDBService> mockAccountDbService = new();
             mockAccountDbService
-                .Setup(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)))
                 .ReturnsAsync(new Account() { Id = "123" });
             Mock<IFileHelper> mockFileHelper = new();
             mockFileHelper
-                .Setup(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.Username)))
                 .Returns(true);
             mockFileHelper
-                .Setup(x => x.GetInstanceFromFile(It.Is<string>(x => x == request.UserId)))
+                .Setup(x => x.GetInstanceFromFile(It.Is<string>(x => x == request.Username)))
                 .ReturnsAsync(instanceResponse);
             Mock<IFileDBService> mockFileDBService = new();
             mockFileDBService
-                .Setup(x => x.SaveFile(It.Is<string>(x  => x == request.UserId), It.IsAny<string>()));
+                .Setup(x => x.SaveFile(It.Is<string>(x  => x == request.Username), It.IsAny<string>()));
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.InsertInstance(It.IsAny<Instance>()))
@@ -164,10 +164,10 @@ namespace cst_back.tests.Services.InstanceServiceTest
             
             await service.CreateInstance(request, context);
 
-            mockAccountDbService.Verify(x => x.GetAccountByUserId(It.Is<string>(x => x == request.UserId)), Times.AtLeastOnce);
-            mockFileHelper.Verify(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.UserId)), Times.AtLeastOnce);
+            mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.AtLeastOnce);
+            mockFileHelper.Verify(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.Username)), Times.AtLeastOnce);
             mockInstanceDBService.Verify(x => x.InsertInstance(It.IsAny<Instance>()), Times.AtLeastOnce);
-            mockFileDBService.Verify(x => x.SaveFile(It.Is<string>(x => x == request.UserId), It.IsAny<string>()));
+            mockFileDBService.Verify(x => x.SaveFile(It.Is<string>(x => x == request.Username), It.IsAny<string>()));
         }
     }
 }
