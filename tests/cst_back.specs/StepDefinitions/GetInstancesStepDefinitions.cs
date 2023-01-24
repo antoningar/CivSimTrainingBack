@@ -47,8 +47,7 @@ namespace cst_back.specs.StepDefinitions.Instances
                 .ReturnsAsync(Helper.GetListInstance().FindAll(x => x.Map == "Seven Seas"));
 
 
-            RPCInstance.RPCInstanceBase instancesService = Helper.GetInstanceService(mockInstanceDBService: dbServiceMock);
-            _instancesServer = ServersFixtures.GetInstancesServer(instancesService, dbServiceMock, mockLeaderboardDBService);
+            _instancesServer = ServersFixtures.GetInstancesServer(dbServiceMock, mockLeaderboardDBService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions
             {
                 HttpClient = _instancesServer.CreateClient()
