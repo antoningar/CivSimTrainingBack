@@ -24,6 +24,12 @@ namespace cst_back.Helpers
             return files.Any(x => x.Contains("_" + username + "_", StringComparison.OrdinalIgnoreCase));
         }
 
+        public bool IsInstanceTmpFilesExistByInstanceId(string instancId)
+        {
+            string[] files = Directory.GetFiles(TMP_PATH);
+            return files.Any(x => x.Contains("_" + instancId, StringComparison.OrdinalIgnoreCase));
+        }
+
         public async Task<FileStream?> WriteFile(IAsyncStreamReader<GetInfoRequest> requestStream, string suffix)
         {
             FileStream? file = null;
