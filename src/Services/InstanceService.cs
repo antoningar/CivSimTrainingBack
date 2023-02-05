@@ -193,7 +193,9 @@ namespace cst_back.Services
             await CheckCreateInstancePreconditions(request);
             string? id = await InsertInstance(request);
             await InsertFile(request.Username, id!);
-            
+
+            _fileHelper.DeleteTmpFileByUsername(request.Username);
+
             return new CreateInstanceResponse
             {
                 Id = id

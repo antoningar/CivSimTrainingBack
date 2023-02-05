@@ -3,6 +3,7 @@ using cst_back.Helpers;
 using cst_back.Models;
 using cst_back.Protos;
 using Grpc.Core;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace cst_back.Services
@@ -11,11 +12,15 @@ namespace cst_back.Services
     {
         private IFileHelper _fileHelper;
         private IAccountDBService _accounDBService;
+        private IInstanceDBService _instanceDBService;
+        private IFileDBService _fileDBService;
 
-        public FileInfoService(IFileHelper fileHelper, IAccountDBService accountDBService)
+        public FileInfoService(IFileHelper fileHelper, IAccountDBService accountDBService, IInstanceDBService instanceDBService, IFileDBService fileDBService)
         {
             _fileHelper = fileHelper;
             _accounDBService = accountDBService;
+            _instanceDBService = instanceDBService;
+            _fileDBService = fileDBService;
         }
 
         public override async Task<GetBaseInfoResponse> GetBaseInfo(IAsyncStreamReader<GetInfoRequest> requestStream, ServerCallContext context)
@@ -108,6 +113,28 @@ namespace cst_back.Services
             }
 
             return response;
+        }
+
+        private async Task CheckInstance(string instanceId)
+        {
+            Instance? instance = await _instanceDBService.GetInstance(instanceId);
+            if (instance == null)
+                throw new RpcException(new Status(StatusCode.NotFound, "instance not found"));
+
+        }
+
+        public override async Task DownloadSave(DownloadSaveRequest request, IServerStreamWriter<DownloadSaveResponse> responseStream, ServerCallContext context)
+        {
+            try
+            {
+                await CheckInstance(request.InstanceID);
+                ObjectId fileObjectId = await  _fileDBService.GetFileIdByInstanceId(request.InstanceID);
+                await _fileDBService.DownloadFile(fileObjectId, responseStream);
+            }
+            catch (MongoException ex)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, ex.Message));
+            }
         }
     }
 }

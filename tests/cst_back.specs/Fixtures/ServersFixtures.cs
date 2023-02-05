@@ -90,10 +90,14 @@ namespace cst_back.specs.Fixtures
 
         public static TestServer GetFileInfoServer(
             Mock<IFileHelper>? mockFileHelper = null,
-            Mock<IAccountDBService>? mockAccountDBService = null)
+            Mock<IAccountDBService>? mockAccountDBService = null,
+            Mock<IInstanceDBService>? mockInstanceDBService = null,
+            Mock<IFileDBService>? mockFileDBService = null)
         {
             mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
             mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
+            mockInstanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>() : mockInstanceDBService;
+            mockFileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>() : mockFileDBService;
 
             return new TestServer(new WebHostBuilder()
                 .ConfigureServices(services =>
@@ -105,6 +109,8 @@ namespace cst_back.specs.Fixtures
 
                     services.AddSingleton(mockFileHelper.Object);
                     services.AddSingleton(mockAccountDBService.Object);
+                    services.AddSingleton(mockFileDBService.Object);
+                    services.AddSingleton(mockInstanceDBService.Object);
                 })
                 .Configure(app =>
                 {

@@ -9,6 +9,16 @@ service RPCFileInfo {
 	rpc GetFinalInfo(stream GetInfoRequest) returns (GetFinalInfoResponse);
 
 	rpc DeleteTmpFiles(DeleteTmpFilesRequest) returns (DeleteTmpFilesResponse);
+
+	rpc DownloadSave(DownloadSaveRequest) returns (stream DownloadSaveResponse);
+}
+
+message DownloadSaveRequest {
+	string InstanceID = 1;
+}
+
+message DownloadSaveResponse {
+	bytes File = 1;
 }
 
 message DeleteTmpFilesRequest {
