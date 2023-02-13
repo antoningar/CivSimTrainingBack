@@ -9,6 +9,6 @@
         public string CounterAccountId { get; set; } = null!;
         public string InstanceCollectionName { get; set; } = null!;
         public string LeaderboardCollectionName { get; set; } = null!;
-        public string FileBucketName { get; set; } = null!;
+        public string BaseSaveBucketName { get; set; } = null!;
     }
 }

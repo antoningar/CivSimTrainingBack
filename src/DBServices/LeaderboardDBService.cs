@@ -18,6 +18,11 @@ namespace cst_back.DBServices
                 dbSettings.Value.LeaderboardCollectionName);
         }
 
+        public async Task InsertLeaderboard(Leaderboard leaderboard)
+        {
+            await _leaderboardCollection.InsertOneAsync(leaderboard);
+        }
+
         public async Task<Leaderboard?> GetLeaderboard(string id)
         {
             return await _leaderboardCollection.Find(x => x.InstanceId == id).FirstAsync();

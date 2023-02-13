@@ -13,5 +13,7 @@ namespace cst_back.Helpers
 
         public Task<Instance> GetInstanceFromFile(string filePath);
         public int DeleteTmpFileByUsername(string username);
+
+        public Task<Stats> GetGameStatsFromfile(string instanceId); 
     }
 }

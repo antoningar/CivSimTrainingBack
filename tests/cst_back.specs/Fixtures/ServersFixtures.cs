@@ -1,6 +1,7 @@
 ﻿using cst_back.DBServices;
 using cst_back.Helpers;
 using cst_back.Interceptors;
+using cst_back.Models;
 using cst_back.Protos;
 using cst_back.Services;
 using cst_back.Validators;
@@ -61,6 +62,9 @@ namespace cst_back.specs.Fixtures
             mockLeaderboardService = (mockLeaderboardService == null) ? new Mock<ILeaderboardDBService>() : mockLeaderboardService;
             mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
             mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
+            mockFileHelper
+                .Setup(x => x.GetGameStatsFromfile(It.IsAny<string>()))
+                .ReturnsAsync(new Stats() { Culture = 104.2F, Faith = 14, Gold = 43, Science = 111.3F });
             mockFileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>() : mockFileDBService;
 
             return new TestServer(new WebHostBuilder()

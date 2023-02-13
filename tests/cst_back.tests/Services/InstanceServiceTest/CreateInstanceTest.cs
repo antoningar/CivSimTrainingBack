@@ -158,10 +158,50 @@ namespace cst_back.tests.Services.InstanceServiceTest
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.InsertInstance(It.IsAny<Instance>()))
-                .ReturnsAsync("124");
+                .ReturnsAsync(new Instance() { Id = "12" });
 
             InstanceService service = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService, mockFileHelper: mockFileHelper, mockFileDBService: mockFileDBService, mockInstanceDBService: mockInstanceDBService);
             
+            await service.CreateInstance(request, context);
+
+            mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.AtLeastOnce);
+            mockFileHelper.Verify(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.Username)), Times.AtLeastOnce);
+            mockInstanceDBService.Verify(x => x.InsertInstance(It.IsAny<Instance>()), Times.AtLeastOnce);
+            mockFileDBService.Verify(x => x.SaveFile(It.Is<string>(x => x == request.Username), It.IsAny<string>()));
+        }
+
+        [Fact]
+        public async void CreateInstance_ShouldCreateLeaderboard()
+        {
+            CreateInstanceRequest request = new()
+            {
+                Username = "userId",
+                Goal = "Max science turn 60"
+            };
+
+            Instance instanceResponse = Helper.GetInstance();
+
+            Mock<IAccountDBService> mockAccountDbService = new();
+            mockAccountDbService
+                .Setup(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)))
+                .ReturnsAsync(new Account() { Id = "123" });
+            Mock<IFileHelper> mockFileHelper = new();
+            mockFileHelper
+                .Setup(x => x.IsInstanceTmpFilesExist(It.Is<string>(x => x == request.Username)))
+                .Returns(true);
+            mockFileHelper
+                .Setup(x => x.GetInstanceFromFile(It.Is<string>(x => x == request.Username)))
+                .ReturnsAsync(instanceResponse);
+            Mock<IFileDBService> mockFileDBService = new();
+            mockFileDBService
+                .Setup(x => x.SaveFile(It.Is<string>(x => x == request.Username), It.IsAny<string>()));
+            Mock<IInstanceDBService> mockInstanceDBService = new();
+            mockInstanceDBService
+                .Setup(x => x.InsertInstance(It.IsAny<Instance>()))
+                .ReturnsAsync(new Instance() { Id = "12" });
+
+            InstanceService service = Helper.GetInstanceService(mockAccountDBService: mockAccountDbService, mockFileHelper: mockFileHelper, mockFileDBService: mockFileDBService, mockInstanceDBService: mockInstanceDBService);
+
             await service.CreateInstance(request, context);
 
             mockAccountDbService.Verify(x => x.GetAccountByUsernameAsync(It.Is<string>(x => x == request.Username)), Times.AtLeastOnce);

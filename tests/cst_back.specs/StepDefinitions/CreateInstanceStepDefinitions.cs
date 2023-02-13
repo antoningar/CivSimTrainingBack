@@ -38,7 +38,7 @@ namespace cst_back.specs.StepDefinitions
             Mock<IInstanceDBService> mockInstanceDBService = new();
             mockInstanceDBService
                 .Setup(x => x.InsertInstance(It.IsAny<Instance>()))
-                .ReturnsAsync("12");
+                .ReturnsAsync(new Instance() { Id = "12"});
 
             _server = ServersFixtures.GetInstancesServer(mockAccountDBService: mockAccountDBService, mockFileHelper: mockFileHelper, mockInstanceDBService: mockInstanceDBService);
             var channel = GrpcChannel.ForAddress("https://localhost", new GrpcChannelOptions

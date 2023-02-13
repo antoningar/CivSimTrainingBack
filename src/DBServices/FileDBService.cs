@@ -1,14 +1,10 @@
 ﻿using cst_back.Protos;
 using cst_back.Settings;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using System.IO;
-using System.Net.Sockets;
 
 namespace cst_back.DBServices
 {
@@ -24,7 +20,7 @@ namespace cst_back.DBServices
 
             _bucket = new GridFSBucket(database, new GridFSBucketOptions
             {
-                BucketName= dbSettings.Value.FileBucketName
+                BucketName= dbSettings.Value.BaseSaveBucketName
             });
         }
 

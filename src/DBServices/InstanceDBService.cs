@@ -46,10 +46,10 @@ namespace cst_back.DBServices
             return await _instanceCollection.Find(x => x.Id == id).FirstAsync();
         }
 
-        public async Task<string?> InsertInstance(Instance instance)
+        public async Task<Instance?> InsertInstance(Instance instance)
         {
             await _instanceCollection.InsertOneAsync(instance);
-            return instance.Id;
+            return instance;
         }
     }
 }

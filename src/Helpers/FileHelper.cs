@@ -1,6 +1,7 @@
 ﻿using cst_back.Models;
 using cst_back.Protos;
 using Grpc.Core;
+using System.Globalization;
 
 namespace cst_back.Helpers
 {
@@ -67,6 +68,18 @@ namespace cst_back.Helpers
                 }
             }
             return count;
+        }
+
+        public Task<Stats> GetGameStatsFromfile(string instanceId)
+        {
+            //Read from file
+            return Task.FromResult(new Stats ()
+            {
+                Science = 140.3F,
+                Culture = 110.2F,
+                Faith = 2,
+                Gold = 60
+            });
         }
     }
 }

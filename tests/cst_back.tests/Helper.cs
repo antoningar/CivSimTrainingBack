@@ -162,13 +162,16 @@ namespace cst_back.tests
             Mock<IFileDBService>? mockFileDBService = null
             )
         {
-            IInstanceDBService instanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>().Object : mockInstanceDBService!.Object;
-            ILeaderboardDBService leaderboardDBService = (mockLeaderboardDBService == null) ? new Mock<ILeaderboardDBService>().Object: mockLeaderboardDBService!.Object;
-            IAccountDBService accountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>().Object : mockAccountDBService!.Object;
-            IFileHelper fileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>().Object : mockFileHelper!.Object;
-            IFileDBService fileDBService = (mockFileDBService == null) ? new  Mock<IFileDBService>().Object : mockFileDBService!.Object;
+            mockInstanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>() : mockInstanceDBService;
+            mockLeaderboardDBService = (mockLeaderboardDBService == null) ? new Mock<ILeaderboardDBService>() : mockLeaderboardDBService;
+            mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
+            mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
+            mockFileHelper
+                .Setup(x => x.GetGameStatsFromfile(It.IsAny<string>()))
+                .ReturnsAsync(new Stats() { Culture = 104.2F, Faith = 14, Gold = 43, Science = 111.3F });
+            mockFileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>() : mockFileDBService;
 
-            return new InstanceService(instanceDBService,leaderboardDBService,accountDBService, fileHelper, fileDBService);
+            return new InstanceService(mockInstanceDBService.Object, mockLeaderboardDBService.Object, mockAccountDBService.Object, mockFileHelper.Object, mockFileDBService.Object);
         }
 
         public static FileInfoService GetFileInfoService(
@@ -178,12 +181,12 @@ namespace cst_back.tests
             Mock<IFileDBService>? mockFileDBService = null
             )
         {
-            IFileHelper fileHelperService = (mockFileHelper == null) ? new Mock<IFileHelper>().Object : mockFileHelper!.Object;
-            IAccountDBService accountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>().Object : mockAccountDBService!.Object;
-            IInstanceDBService instanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>().Object : mockInstanceDBService!.Object;
-            IFileDBService fileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>().Object : mockFileDBService!.Object;
+            mockInstanceDBService = (mockInstanceDBService == null) ? new Mock<IInstanceDBService>() : mockInstanceDBService;
+            mockAccountDBService = (mockAccountDBService == null) ? new Mock<IAccountDBService>() : mockAccountDBService;
+            mockFileHelper = (mockFileHelper == null) ? new Mock<IFileHelper>() : mockFileHelper;
+            mockFileDBService = (mockFileDBService == null) ? new Mock<IFileDBService>() : mockFileDBService;
 
-            return new FileInfoService(fileHelperService, accountDBService,  instanceDBService, fileDBService);
+            return new FileInfoService(mockFileHelper.Object, mockAccountDBService.Object,  mockInstanceDBService.Object, mockFileDBService.Object);
         }
     }
 }

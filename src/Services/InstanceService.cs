@@ -156,7 +156,7 @@ namespace cst_back.Services
                 throw new RpcException(new Status(StatusCode.FailedPrecondition, "Saves not found"));
         }
 
-        private async Task<string?> InsertInstance(CreateInstanceRequest request)
+        private async Task<Instance?> InsertInstance(CreateInstanceRequest request)
         {
             try
             {
@@ -188,17 +188,46 @@ namespace cst_back.Services
             }
         }
 
+        private string GetValueFromGoal(string goal, Stats stats)
+        {
+            switch (goal)
+            {
+                default:
+                    return stats.Gold.ToString();
+            }
+        }
+
+        private async Task CreateLeaderboard(Instance instance)
+        {
+            Stats stats = await _fileHelper.GetGameStatsFromfile(instance!.Id!);
+            Models.Leaderboard leaderboard = new()
+            {
+                InstanceId = instance.Id,
+                Results = new Models.Result[]
+                {
+                    new Models.Result
+                    {
+                        Position = 1,
+                        Username = instance.Creator,
+                        Value = GetValueFromGoal(instance.Goal!, stats)
+                    }
+                }
+            };
+            await _leaderboardDBService.InsertLeaderboard(leaderboard);
+        }
+
         public override async Task<CreateInstanceResponse> CreateInstance(CreateInstanceRequest request, ServerCallContext context)
         {
             await CheckCreateInstancePreconditions(request);
-            string? id = await InsertInstance(request);
-            await InsertFile(request.Username, id!);
+            Instance? instance = await InsertInstance(request);
+            await InsertFile(request.Username, instance!.Id!);
+            await CreateLeaderboard(instance!);
 
             _fileHelper.DeleteTmpFileByUsername(request.Username);
 
             return new CreateInstanceResponse
             {
-                Id = id
+                Id = instance!.Id!
             };
         }
     }

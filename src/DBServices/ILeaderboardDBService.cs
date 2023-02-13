@@ -1,7 +1,10 @@
-﻿namespace cst_back.DBServices
+﻿using cst_back.Models;
+
+namespace cst_back.DBServices
 {
     public interface ILeaderboardDBService
     {
-        public Task<Models.Leaderboard?> GetLeaderboard(string id);
+        public Task<Leaderboard?> GetLeaderboard(string id);
+        public Task InsertLeaderboard(Leaderboard leaderboard);
     }
 }
